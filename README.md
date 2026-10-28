@@ -3,7 +3,6 @@
 **Atatürk Topluluğu** için geliştirilen, üniversite öğrenci topluluklarının üye, etkinlik ve organizasyon süreçlerini tek bir yerden yönetmeyi amaçlayan web tabanlı yönetim platformudur.
 
 ![Durum](https://img.shields.io/badge/durum-geliştirme%20aşamasında-yellow)
-![Lisans](https://img.shields.io/badge/lisans-MIT-blue)
 ![PR](https://img.shields.io/badge/PRs-welcome-brightgreen)
 
 ---
