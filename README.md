@@ -11,20 +11,11 @@
 
 - [Proje Hakkında](#-proje-hakkında)
 - [Özellikler](#-özellikler)
-- [Kullanıcı Rolleri](#-kullanıcı-rolleri)
-- [Teknoloji Yığını](#-teknoloji-yığını)
-- [Kurulum](#-kurulum)
-- [Proje Yapısı](#-proje-yapısı)
 - [Branch Stratejisi](#-branch-stratejisi)
-- [Commit Kuralları](#-commit-kuralları)
-- [Katkı Süreci](#-katkı-süreci)
-- [Yol Haritası](#-yol-haritası)
-- [Lisans](#-lisans)
-- [İletişim](#-iletişim)
 
 ---
 
-## 📖 Proje Hakkında
+## Proje Hakkında
 
 Üniversite topluluklarında üye kayıtları, etkinlik duyuruları, yoklamalar ve yönetim kurulu işleri genellikle WhatsApp grupları, Excel tabloları ve kâğıt formlar arasında dağınık şekilde yürür. Bu proje, bu süreçleri **tek bir platformda** toplayarak:
 
@@ -36,73 +27,30 @@ hedefler.
 
 ---
 
-## ✨ Özellikler
+## Özellikler
 
-### 👥 Üye Yönetimi
+### Üye Yönetimi
 - Üyelik başvurusu ve yönetici onay süreci
 - Üye profilleri (ad soyad, bölüm, sınıf, iletişim bilgisi)
 - Aktif / pasif / mezun üye durumları
 - Üye listesi, arama ve filtreleme
 - Üyelik başlangıç ve bitiş tarihi takibi
 
-### 📅 Etkinlik Yönetimi
+### Etkinlik Yönetimi
 - Etkinlik oluşturma, düzenleme ve iptal etme
 - Tarih, saat, mekân ve kontenjan bilgisi
 - Etkinliğe kayıt / katılım başvurusu
 - Geçmiş etkinlik arşivi
 
-### 📢 Duyurular ve İletişim
+### Duyurular ve İletişim
 - Topluluk geneline duyuru yayınlama
 - Etkinlik öncesi hatırlatma bildirimleri
 
-> ⚠️ Özelliklerin bir kısmı geliştirme aşamasındadır. Güncel durum için [Yol Haritası](#-yol-haritası) bölümüne bakın.
-
-## 🚀 Kurulum
-
-> Aşağıdaki adımlar örnek olarak verilmiştir; projenin kullandığı teknolojiye göre güncelleyin.
-
-### Gereksinimler
-- Git
-- `[Gerekli çalışma ortamı ve sürümü]`
-- `[Veritabanı sunucusu]`
-
-### Adımlar
-
-```bash
-# 1. Depoyu klonlayın
-git clone https://github.com/can-ozturk/ogrenci-topluluk-yonetim-platformu.git
-
-# 2. Proje klasörüne girin
-cd ogrenci-topluluk-yonetim-platformu
-
-# 3. Bağımlılıkları yükleyin
-# [Proje için uygun komut]
-
-# 4. Ortam değişkenlerini hazırlayın
-cp .env.example .env
-
-# 5. Uygulamayı başlatın
-# [Proje için uygun komut]
-```
+> Özelliklerin bir kısmı geliştirme aşamasındadır. Güncel durum için [Yol Haritası](#-yol-haritası) bölümüne bakın.
 
 ---
 
-## 📂 Proje Yapısı
-
-<!-- TODO: Gerçek klasör yapına göre güncelle -->
-
-```
-ogrenci-topluluk-yonetim-platformu/
-├── docs/           # Dokümantasyon
-├── src/            # Kaynak kodlar
-├── tests/          # Testler
-├── .env.example    # Örnek ortam değişkenleri
-└── README.md
-```
-
----
-
-## 🌿 Branch Stratejisi
+## Branch Stratejisi
 
 Projede düzenli ve izlenebilir bir geliştirme süreci için **Git Flow'un sadeleştirilmiş** bir sürümü kullanılır.
 
