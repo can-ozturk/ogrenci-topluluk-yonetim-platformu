@@ -3,7 +3,6 @@
 **Atatürk Topluluğu** için geliştirilen, üniversite öğrenci topluluklarının üye, etkinlik ve organizasyon süreçlerini tek bir yerden yönetmeyi amaçlayan web tabanlı yönetim platformudur.
 
 ![Durum](https://img.shields.io/badge/durum-geliştirme%20aşamasında-yellow)
-![PR](https://img.shields.io/badge/PRs-welcome-brightgreen)
 
 ---
 
@@ -21,9 +20,7 @@
 
 - Üye bilgilerini düzenli ve güvenli şekilde tutmayı,
 - Etkinlikleri planlamayı, duyurmayı ve katılımı takip etmeyi,
-- Yönetim kuruluna raporlanabilir veriler sunmayı
-
-hedefler.
+- Yönetim kuruluna raporlanabilir veriler sunmayı hedefler.
 
 ---
 
@@ -56,17 +53,13 @@ Projede düzenli ve izlenebilir bir geliştirme süreci için **Git Flow'un sade
 
 ### Ana Branch'ler
 
-| Branch | Amaç |
-|---|---|
 | `main` | Kararlı, yayına hazır sürüm. Doğrudan commit atılmaz. |
 | `develop` | Geliştirmelerin birleştirildiği ana çalışma branch'i. |
 
 ### Geçici Branch'ler
 
-|---|---|---|
 | `feature/` | Yeni özellik |
 | `hotfix/` | `develop ve main` üzerindeki acil düzeltme |
-|---|---|---|
 
 ### Akış
 
