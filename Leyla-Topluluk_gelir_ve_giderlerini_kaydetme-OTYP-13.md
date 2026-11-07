@@ -27,5 +27,3 @@
 | `date` | Date | Evet | İşlem tarihi |
 | `receipt_url` | String | Hayır | Fatura/Fiş görsel adresi |
 
-## 5. İş Akış Şeması
-<img width="454" height="662" alt="image" src="https://github.com/user-attachments/assets/e51ffc26-f31c-4de2-a478-d3e4122d3df3" />
