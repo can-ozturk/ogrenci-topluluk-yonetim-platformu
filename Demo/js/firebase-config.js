@@ -8,14 +8,14 @@
   "use strict";
 
   var firebaseConfig = {
-    apiKey: "AIzaSyBNrlUbuQyo9Dv60PFwN301AC5qzoXBQmw",
-    authDomain: "topluluk-yonetim-platformu.firebaseapp.com",
-    databaseURL: "https://topluluk-yonetim-platformu-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "topluluk-yonetim-platformu",
-    storageBucket: "topluluk-yonetim-platformu.appspot.com",
-    messagingSenderId: "497301114412",
-    appId: "1:497301114412:web:ff193edfcd426dd743cb89",
-    measurementId: "G-J0YTDYYCM8"
+    apiKey: "GIZLI",
+    authDomain: "GIZLI",
+    databaseURL: "GIZLI",
+    projectId: "GIZLI",
+    storageBucket: "GIZLI",
+    messagingSenderId: "GIZLI",
+    appId: "GIZLI",
+    measurementId: "GIZLI"
   };
 
   var isFileProtocol = window.location.protocol === "file:";
