@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="tr" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Atatürk Topluluğu Öğrenci Topluluk Yönetim Platformu — Üye Giriş ve Kayıt" />
+  <title>Kayıt Ol — Atatürk Topluluğu</title>
+  <link rel="icon" type="image/x-icon" href="./assets/favicon.ico" />
+  <link rel="shortcut icon" type="image/x-icon" href="./assets/favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./css/style.css" />
+  <link rel="stylesheet" href="./css/platform.css" />
+</head>
+<body class="auth-page" data-initial-view="register">
+  <!-- Katman 1-2: Anıtkabir fotoğrafı ve koyu overlay -->
+  <div class="bg-stage" aria-hidden="true"></div>
+  <div class="bg-overlay" aria-hidden="true"></div>
+
+  <!-- Katman 3: Fareyi takip eden partikül canvas'ı (pointer-events: none) -->
+  <canvas id="particleCanvas" class="particle-canvas" aria-hidden="true"></canvas>
+
+  <!-- Sağ Üst Köşe: Animasyonlu Koyu / Açık Tema Geçiş Butonu -->
+  <header class="top-Controls">
+    <button
+      type="button"
+      id="themeToggleBtn"
+      class="theme-toggle-btn"
+      aria-label="Açık temaya geç"
+      aria-pressed="false"
+    >
+      <span class="theme-icon-wrap" aria-hidden="true">
+        <svg
+          class="theme-icon-svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <!-- Güneş Grubu (Açık Temada Aktif) -->
+          <g class="sun-group">
+            <circle cx="12" cy="12" r="4.5" fill="currentColor" fill-opacity="0.18" />
+          </g>
+          <g class="sun-rays">
+            <line x1="12" y1="2" x2="12" y2="4.2" />
+            <line x1="12" y1="19.8" x2="12" y2="22" />
+            <line x1="4.93" y1="4.93" x2="6.49" y2="6.49" />
+            <line x1="17.51" y1="17.51" x2="19.07" y2="19.07" />
+            <line x1="2" y1="12" x2="4.2" y2="12" />
+            <line x1="19.8" y1="12" x2="22" y2="12" />
+            <line x1="4.93" y1="19.07" x2="6.49" y2="17.51" />
+            <line x1="17.51" y1="6.49" x2="19.07" y2="4.93" />
+          </g>
+          <!-- Ay Grubu (Koyu Temada Aktif) -->
+          <g class="moon-group">
+            <path
+              d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11Z"
+              fill="currentColor"
+              fill-opacity="0.18"
+            />
+          </g>
+        </svg>
+      </span>
+      <span id="themeToggleText">Koyu Tema</span>
+    </button>
+  </header>
+
+  <main class="platform-main">
+    <!-- Katman 4: Saydam cam platform -->
+    <div class="glass-platform" id="glassPlatform">
+
+      <!-- SOL SÜTUN: Giriş ↔ Kayıt geçişinde sabit kalır -->
+      <section class="platform-left" aria-label="Atatürk Topluluğu">
+        <h1 class="hero-title">Atatürk<br />Topluluğu</h1>
+        <p class="hero-desc">
+          Etkinlikleri, duyuruları ve topluluk çalışmalarını takip etmek için hesabınıza giriş yapın.
+        </p>
+
+        <div class="glass-box">
+          <!-- Salt dekoratif arama çubuğu (daktilo animasyonu burada yazılır) -->
+          <div class="search-pill" aria-hidden="true">
+            <span class="search-text-wrap">
+              <span class="search-text-inner" id="typewriterText"><span class="tw-cursor" id="typewriterCursor"></span></span>
+            </span>
+            <svg
+              class="search-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.3-4.3" />
+            </svg>
+          </div>
+
+          <div class="feature-panel">
+            <ul class="feature-grid">
+              <li class="feature-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10" />
+                  <circle cx="12" cy="12" r="6" />
+                  <circle cx="12" cy="12" r="2" />
+                </svg>
+                <span>Etkinlikler</span>
+              </li>
+              <li class="feature-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                </svg>
+                <span>Duyurular</span>
+              </li>
+              <li class="feature-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="m9 12 2 2 4-4" />
+                </svg>
+                <span>Topluluk çalışmaları</span>
+              </li>
+              <li class="feature-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
+                  <path d="M14 2v4a2 2 0 0 0 2 2h4" />
+                  <path d="M8 18v-1" />
+                  <path d="M12 18v-6" />
+                  <path d="M16 18v-3" />
+                </svg>
+                <span>Üyelik</span>
+              </li>
+            </ul>
+          </div>
+
+          <span class="glass-glare" aria-hidden="true"></span>
+        </div>
+      </section>
+
+      <!-- SAĞ SÜTUN: Beyaz form kartı (Giriş + Kayıt görünümleri) -->
+      <section class="platform-right" id="formColumn">
+        <div class="form-card" id="formCard">
+          <div class="form-viewport" id="formViewport">
+
+            <!-- Genel Hata / Durum Bildirim Kutusu (aktif görünümün başlığının altına taşınır) -->
+            <div
+              id="formAlertBox"
+              class="alert-box alert-error"
+              role="alert"
+              aria-live="polite"
+              hidden
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
+              </svg>
+              <span id="formAlertText"></span>
+            </div>
+
+            <!-- ===================== GİRİŞ GÖRÜNÜMÜ ===================== -->
+            <div class="form-view" id="viewLogin" data-view="login" role="group" aria-labelledby="loginTitle" hidden>
+              <header class="view-head">
+                <h2 id="loginTitle" class="view-title">Giriş Yap</h2>
+                <p class="view-sub">Hesabınıza giriş yapın.</p>
+              </header>
+
+              <form id="loginForm" class="auth-form" novalidate>
+                <!-- E-posta Alanı -->
+                <div class="form-group">
+                  <label for="loginEmail" class="form-label">E-posta Adresi</label>
+                  <div class="input-wrapper">
+                    <input
+                      type="email"
+                      id="loginEmail"
+                      name="email"
+                      class="form-input"
+                      placeholder="ornek@universite.edu.tr"
+                      autocomplete="email"
+                      inputmode="email"
+                      required
+                      aria-invalid="false"
+                      aria-describedby="loginEmailError"
+                    />
+                  </div>
+                  <p id="loginEmailError" class="field-error" role="alert" aria-live="polite" hidden></p>
+                </div>
+
+                <!-- Şifre Alanı (Animasyonlu Göster/Gizle Göz İkonu ile) -->
+                <div class="form-group">
+                  <label for="loginPassword" class="form-label">Şifre</label>
+                  <div class="input-wrapper">
+                    <input
+                      type="password"
+                      id="loginPassword"
+                      name="password"
+                      class="form-input has-trailing-btn"
+                      placeholder="Şifrenizi girin"
+                      autocomplete="current-password"
+                      required
+                      aria-invalid="false"
+                      aria-describedby="loginPasswordError"
+                    />
+                    <button
+                      type="button"
+                      class="password-toggle-btn"
+                      data-toggle-password="loginPassword"
+                      data-visible="false"
+                      aria-label="Şifreyi göster"
+                      aria-pressed="false"
+                    >
+                      <svg class="eye-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path class="eye-lid" d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z" />
+                        <circle class="eye-pupil" cx="12" cy="12" r="3" />
+                        <line class="eye-slash" x1="3" y1="3" x2="21" y2="21" />
+                      </svg>
+                    </button>
+                  </div>
+                  <p id="loginPasswordError" class="field-error" role="alert" aria-live="polite" hidden></p>
+                </div>
+
+                <button type="submit" id="loginSubmitBtn" class="submit-btn">
+                  <svg class="btn-spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true" hidden>
+                    <path d="M12 2a10 10 0 0 1 10 10" />
+                  </svg>
+                  <span class="btn-label">Giriş Yap</span>
+                </button>
+              </form>
+
+              <footer class="auth-footer">
+                <span>Hesabın yok mu?</span>
+                <a href="./register.html" class="auth-link" data-switch-view="register">Kayıt Ol</a>
+              </footer>
+            </div>
+
+            <!-- ===================== KAYIT GÖRÜNÜMÜ ===================== -->
+            <div class="form-view is-active" id="viewRegister" data-view="register" role="group" aria-labelledby="registerTitle">
+              <header class="view-head">
+                <h2 id="registerTitle" class="view-title">Kayıt Ol</h2>
+                <p class="view-sub">Topluluğa katılmak için hesabınızı oluşturun.</p>
+              </header>
+
+              <form id="registerForm" class="auth-form" novalidate>
+                <!-- Ad / Soyad -->
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="registerFirstName" class="form-label">Ad</label>
+                    <div class="input-wrapper">
+                      <input
+                        type="text"
+                        id="registerFirstName"
+                        name="firstName"
+                        class="form-input"
+                        placeholder="Adınız"
+                        autocomplete="given-name"
+                        maxlength="40"
+                        required
+                        aria-invalid="false"
+                        aria-describedby="registerFirstNameError"
+                      />
+                    </div>
+                    <p id="registerFirstNameError" class="field-error" role="alert" aria-live="polite" hidden></p>
+                  </div>
+                  <div class="form-group">
+                    <label for="registerLastName" class="form-label">Soyad</label>
+                    <div class="input-wrapper">
+                      <input
+                        type="text"
+                        id="registerLastName"
+                        name="lastName"
+                        class="form-input"
+                        placeholder="Soyadınız"
+                        autocomplete="family-name"
+                        maxlength="40"
+                        required
+                        aria-invalid="false"
+                        aria-describedby="registerLastNameError"
+                      />
+                    </div>
+                    <p id="registerLastNameError" class="field-error" role="alert" aria-live="polite" hidden></p>
+                  </div>
+                </div>
+
+                <!-- Öğrenci Numarası / Bölüm -->
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="registerStudentNumber" class="form-label">Öğrenci No</label>
+                    <div class="input-wrapper">
+                      <input
+                        type="text"
+                        id="registerStudentNumber"
+                        name="studentNumber"
+                        class="form-input"
+                        placeholder="Öğrenci numaranız"
+                        inputmode="numeric"
+                        autocomplete="off"
+                        maxlength="12"
+                        required
+                        aria-invalid="false"
+                        aria-describedby="registerStudentNumberError"
+                      />
+                    </div>
+                    <p id="registerStudentNumberError" class="field-error" role="alert" aria-live="polite" hidden></p>
+                  </div>
+                  <div class="form-group">
+                    <label for="registerDepartment" class="form-label">Bölüm</label>
+                    <div class="input-wrapper">
+                      <input
+                        type="text"
+                        id="registerDepartment"
+                        name="department"
+                        class="form-input"
+                        placeholder="Bölümünüz"
+                        autocomplete="organization-title"
+                        maxlength="80"
+                        required
+                        aria-invalid="false"
+                        aria-describedby="registerDepartmentError"
+                      />
+                    </div>
+                    <p id="registerDepartmentError" class="field-error" role="alert" aria-live="polite" hidden></p>
+                  </div>
+                </div>
+
+                <!-- Kullanıcı Adı Alanı -->
+                <div class="form-group">
+                  <label for="registerUsername" class="form-label">Kullanıcı Adı</label>
+                  <div class="input-wrapper">
+                    <input
+                      type="text"
+                      id="registerUsername"
+                      name="username"
+                      class="form-input"
+                      placeholder="ornek_kullanici"
+                      autocomplete="username"
+                      autocapitalize="none"
+                      spellcheck="false"
+                      required
+                      aria-invalid="false"
+                      aria-describedby="registerUsernameHint registerUsernameError"
+                    />
+                  </div>
+                  <p id="registerUsernameHint" class="field-hint">
+                    3-20 karakter; küçük harf, rakam, nokta (.) ve alt çizgi (_).
+                  </p>
+                  <p id="registerUsernameError" class="field-error" role="alert" aria-live="polite" hidden></p>
+                </div>
+
+                <!-- E-posta Alanı -->
+                <div class="form-group">
+                  <label for="registerEmail" class="form-label">E-posta Adresi</label>
+                  <div class="input-wrapper">
+                    <input
+                      type="email"
+                      id="registerEmail"
+                      name="email"
+                      class="form-input"
+                      placeholder="ad.soyad@universite.edu.tr"
+                      autocomplete="email"
+                      inputmode="email"
+                      required
+                      aria-invalid="false"
+                      aria-describedby="registerEmailError"
+                    />
+                  </div>
+                  <p id="registerEmailError" class="field-error" role="alert" aria-live="polite" hidden></p>
+                </div>
+
+                <!-- Şifre Alanı -->
+                <div class="form-group">
+                  <label for="registerPassword" class="form-label">Şifre</label>
+                  <div class="input-wrapper">
+                    <input
+                      type="password"
+                      id="registerPassword"
+                      name="password"
+                      class="form-input has-trailing-btn"
+                      placeholder="En az 8 karakter, 1 harf, 1 rakam"
+                      autocomplete="new-password"
+                      required
+                      aria-invalid="false"
+                      aria-describedby="registerPasswordError"
+                    />
+                    <button
+                      type="button"
+                      class="password-toggle-btn"
+                      data-toggle-password="registerPassword"
+                      data-visible="false"
+                      aria-label="Şifreyi göster"
+                      aria-pressed="false"
+                    >
+                      <svg class="eye-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path class="eye-lid" d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z" />
+                        <circle class="eye-pupil" cx="12" cy="12" r="3" />
+                        <line class="eye-slash" x1="3" y1="3" x2="21" y2="21" />
+                      </svg>
+                    </button>
+                  </div>
+                  <p id="registerPasswordError" class="field-error" role="alert" aria-live="polite" hidden></p>
+                </div>
+
+                <!-- Şifre Tekrar Alanı (anlık eşleşme bildirimi ile) -->
+                <div class="form-group">
+                  <label for="registerPasswordConfirm" class="form-label">Şifre Tekrar</label>
+                  <div class="input-wrapper">
+                    <input
+                      type="password"
+                      id="registerPasswordConfirm"
+                      name="passwordConfirm"
+                      class="form-input has-trailing-btn"
+                      placeholder="Şifrenizi tekrar girin"
+                      autocomplete="new-password"
+                      required
+                      aria-invalid="false"
+                      aria-describedby="passwordMatchStatus registerPasswordConfirmError"
+                    />
+                    <button
+                      type="button"
+                      class="password-toggle-btn"
+                      data-toggle-password="registerPasswordConfirm"
+                      data-visible="false"
+                      aria-label="Şifreyi göster"
+                      aria-pressed="false"
+                    >
+                      <svg class="eye-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path class="eye-lid" d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z" />
+                        <circle class="eye-pupil" cx="12" cy="12" r="3" />
+                        <line class="eye-slash" x1="3" y1="3" x2="21" y2="21" />
+                      </svg>
+                    </button>
+                  </div>
+                  <p id="passwordMatchStatus" class="field-status" role="status" aria-live="polite" hidden></p>
+                  <p id="registerPasswordConfirmError" class="field-error" role="alert" aria-live="polite" hidden></p>
+                </div>
+
+                <button type="submit" id="registerSubmitBtn" class="submit-btn">
+                  <svg class="btn-spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true" hidden>
+                    <path d="M12 2a10 10 0 0 1 10 10" />
+                  </svg>
+                  <span class="btn-label">Kayıt Ol</span>
+                </button>
+              </form>
+
+              <footer class="auth-footer">
+                <span>Zaten hesabın var mı?</span>
+                <a href="./index.html" class="auth-link" data-switch-view="login">Giriş Yap</a>
+              </footer>
+            </div>
+
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Firebase v10.12.0 Compat CDN ve Uygulama Betikleri (file:// uyumlu klasik defer yapısı) -->
+  <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script defer src="./js/firebase-config.js"></script>
+  <script defer src="./js/theme.js"></script>
+  <script defer src="./js/ui.js"></script>
+  <script defer src="./js/auth.js"></script>
+  <script defer src="./js/particles.js"></script>
+  <script defer src="./js/effects.js"></script>
+  <script defer src="./js/typewriter.js"></script>
+  <script defer src="./js/view-switch.js"></script>
+</body>
+</html>

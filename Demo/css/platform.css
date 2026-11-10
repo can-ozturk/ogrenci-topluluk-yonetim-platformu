@@ -1,0 +1,853 @@
+/* ==========================================================================
+   Atatürk Topluluğu — Giriş / Kayıt Cam Platform Tasarımı (css/platform.css)
+   Katman sırası (arkadan öne):
+     1. .bg-stage        Anıtkabir fotoğrafı (style.css)
+     2. .bg-overlay      Koyu overlay (style.css)
+     3. .particle-canvas Fare takipli partikül ağı (js/particles.js)
+     4. .glass-platform  Saydam cam platform
+     5. İçerik           Sol metin alanı + sağ cam form kartı
+   Yalnızca index.html ve register.html tarafından yüklenir.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Tema Değişkenleri
+   -------------------------------------------------------------------------- */
+:root,
+:root[data-theme="dark"] {
+  --plat-bg: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.07) 0%,
+    rgba(255, 255, 255, 0.04) 55%,
+    rgba(0, 0, 0, 0.16) 100%
+  );
+  --plat-border: rgba(255, 255, 255, 0.16);
+  --plat-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+  --plat-highlight: rgba(255, 255, 255, 0.6);
+
+  --hero-title: #FFFFFF;
+  --hero-desc: rgba(255, 255, 255, 0.75);
+  --box-text: #FFFFFF;
+  --box-bg: rgba(255, 255, 255, 0.06);
+  --box-border: rgba(255, 255, 255, 0.18);
+  --search-bg: rgba(255, 255, 255, 0.11);
+  --search-border: rgba(255, 255, 255, 0.24);
+  --panel-bg: rgba(255, 255, 255, 0.05);
+  --panel-border: rgba(255, 255, 255, 0.12);
+  --glare-color: rgba(255, 255, 255, 0.3);
+
+  /* Form kartı (koyu buzlu cam, bordo vurgulu) */
+  --fc-bg:
+    radial-gradient(130% 55% at 50% 0%, rgba(189, 12, 71, 0.22), transparent 62%),
+    linear-gradient(160deg, rgba(38, 29, 54, 0.82) 0%, rgba(17, 15, 31, 0.88) 100%);
+  --fc-border: rgba(255, 255, 255, 0.14);
+  --fc-shadow: 0 28px 70px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  --fc-title: #FFFFFF;
+  --fc-sub: rgba(255, 255, 255, 0.68);
+  --fc-label: rgba(255, 255, 255, 0.88);
+  --fc-input-bg: rgba(255, 255, 255, 0.08);
+  --fc-input-border: rgba(255, 255, 255, 0.2);
+  --fc-input-text: #FFFFFF;
+  --fc-input-focus-bg: rgba(255, 255, 255, 0.13);
+  --fc-placeholder: rgba(255, 255, 255, 0.52);
+  --fc-hint: rgba(255, 255, 255, 0.6);
+  --fc-icon: rgba(255, 255, 255, 0.7);
+  --fc-link: #FF7BA3;
+  --fc-link-hover: #FFA8C2;
+  --fc-error: #FF8A99;
+  --fc-error-bg: rgba(255, 90, 110, 0.12);
+  --fc-success: #5FDB92;
+  --fc-valid-border: rgba(95, 219, 146, 0.7);
+  --fc-focus-border: #FF4D88;
+  --fc-focus-ring: rgba(255, 77, 136, 0.28);
+}
+
+:root[data-theme="light"] {
+  --plat-bg:
+    radial-gradient(120% 80% at 0% 0%, rgba(189, 12, 71, 0.07) 0%, transparent 55%),
+    linear-gradient(
+      135deg,
+      rgba(253, 251, 249, 0.84) 0%,
+      rgba(247, 243, 239, 0.78) 55%,
+      rgba(240, 234, 230, 0.82) 100%
+    );
+  --plat-border: rgba(255, 255, 255, 0.88);
+  --plat-shadow: 0 32px 76px rgba(16, 14, 24, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  --plat-highlight: rgba(189, 12, 71, 0.55);
+
+  --hero-title: #161822;
+  --hero-desc: #3A3F50;
+  --box-text: #161822;
+  --box-bg: rgba(255, 255, 255, 0.68);
+  --box-border: rgba(255, 255, 255, 0.92);
+  --search-bg: rgba(255, 255, 255, 0.92);
+  --search-border: rgba(22, 24, 34, 0.12);
+  --panel-bg: rgba(255, 255, 255, 0.62);
+  --panel-border: rgba(22, 24, 34, 0.09);
+  --glare-color: rgba(255, 255, 255, 0.82);
+
+  /* Form kartı (aydınlık mermer cam, bordo vurgulu) */
+  --fc-bg:
+    radial-gradient(130% 55% at 50% 0%, rgba(189, 12, 71, 0.11), transparent 62%),
+    linear-gradient(165deg, rgba(255, 255, 255, 0.96) 0%, rgba(251, 248, 246, 0.92) 100%);
+  --fc-border: rgba(255, 255, 255, 0.96);
+  --fc-shadow: 0 24px 56px rgba(18, 16, 28, 0.18), 0 2px 6px rgba(18, 16, 28, 0.06), inset 0 1px 0 #FFFFFF;
+  --fc-title: #161822;
+  --fc-sub: #565B6B;
+  --fc-label: #282C3A;
+  --fc-input-bg: #F3F1EE;
+  --fc-input-border: rgba(22, 24, 34, 0.15);
+  --fc-input-text: #161822;
+  --fc-input-focus-bg: #FFFFFF;
+  --fc-placeholder: #747988;
+  --fc-hint: #646978;
+  --fc-icon: #565B6B;
+  --fc-link: #B00940;
+  --fc-link-hover: #7D052C;
+  --fc-error: #C8223A;
+  --fc-error-bg: #FFF5F6;
+  --fc-success: #187E43;
+  --fc-valid-border: #55B879;
+  --fc-focus-border: #BD0C47;
+  --fc-focus-ring: rgba(189, 12, 71, 0.2);
+}
+
+/* --------------------------------------------------------------------------
+   Sayfa İskeleti (Üstten başlar, yatayda ortalı, kaydırmasız ekrana sığar)
+   -------------------------------------------------------------------------- */
+body.auth-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding: clamp(3.25rem, 6.5vh, 4.25rem) clamp(1rem, 3vw, 2.5rem) clamp(0.75rem, 2vh, 1.5rem);
+}
+
+.particle-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.platform-main {
+  position: relative;
+  z-index: 10;
+  width: min(94vw, 75rem);
+  margin-inline: auto;
+  margin-block: auto;
+}
+
+/* --------------------------------------------------------------------------
+   Cam Platform
+   -------------------------------------------------------------------------- */
+.glass-platform {
+  --mx: 50%;
+  --my: 50%;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(21.5rem, 34vw, 27rem);
+  align-items: center;
+  gap: clamp(1.5rem, 3.5vw, 3.5rem);
+  padding: clamp(1.25rem, 2.8vh, 2.5rem) clamp(1.5rem, 3.2vw, 3rem);
+  border-radius: clamp(1.375rem, 2.2vw, 1.875rem);
+  background: var(--plat-bg);
+  border: 1px solid var(--plat-border);
+  box-shadow: var(--plat-shadow);
+  backdrop-filter: blur(26px) saturate(1.1);
+  -webkit-backdrop-filter: blur(26px) saturate(1.1);
+  animation: platformIn 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  transition:
+    background var(--theme-transition),
+    border-color var(--theme-transition),
+    box-shadow var(--theme-transition);
+}
+
+.glass-platform::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: radial-gradient(
+    280px circle at var(--mx) var(--my),
+    var(--plat-highlight),
+    transparent 62%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+  opacity: 0;
+  transition: opacity 300ms ease;
+  pointer-events: none;
+}
+
+.glass-platform:hover::before {
+  opacity: 1;
+}
+
+@keyframes platformIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Sol Sütun (Sağdaki formla dikeyde hizalı ve yatayda ortalı)
+   -------------------------------------------------------------------------- */
+.platform-left {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--box-text);
+}
+
+.hero-title {
+  font-size: clamp(1.85rem, 3.5vw, 2.85rem);
+  font-weight: 300;
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  color: var(--hero-title);
+  animation: riseIn 600ms cubic-bezier(0.22, 1, 0.36, 1) 100ms both;
+  transition: color var(--theme-transition);
+}
+
+.hero-title::after {
+  content: "";
+  display: block;
+  width: clamp(2.75rem, 4vw, 3.5rem);
+  height: 3px;
+  margin: clamp(0.55rem, 1.3vh, 0.95rem) auto 0;
+  border-radius: 3px;
+  background: linear-gradient(90deg, transparent, var(--primary), transparent);
+}
+
+.hero-desc {
+  max-width: 27.5rem;
+  margin: clamp(0.55rem, 1.3vh, 0.95rem) auto clamp(0.9rem, 2vh, 1.5rem);
+  font-size: clamp(0.84rem, 1vw, 0.9375rem);
+  line-height: 1.55;
+  color: var(--hero-desc);
+  text-wrap: balance;
+  animation: riseIn 600ms cubic-bezier(0.22, 1, 0.36, 1) 160ms both;
+  transition: color var(--theme-transition);
+}
+
+@keyframes riseIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Animasyonlu cam kutu */
+.glass-box {
+  position: relative;
+  width: 100%;
+  max-width: 28.5rem;
+  padding: clamp(0.95rem, 2vh, 1.35rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: clamp(0.7rem, 1.5vh, 1rem);
+  overflow: hidden;
+  border-radius: clamp(1.1rem, 1.6vw, 1.375rem);
+  background: var(--box-bg);
+  border: 1px solid var(--box-border);
+  color: var(--box-text);
+  animation: boxIn 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  transition:
+    background var(--theme-transition),
+    border-color var(--theme-transition),
+    color var(--theme-transition);
+}
+
+@keyframes boxIn {
+  from {
+    opacity: 0;
+    filter: blur(10px);
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: none;
+  }
+}
+
+.glass-glare {
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  left: 0;
+  width: 38%;
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    var(--glare-color) 50%,
+    transparent 100%
+  );
+  opacity: 0;
+  pointer-events: none;
+  animation: glare 500ms ease-out 1250ms 1 both;
+}
+
+@keyframes glare {
+  from {
+    opacity: 0;
+    transform: translateX(-160%) skewX(-15deg);
+  }
+  15%,
+  85% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: translateX(420%) skewX(-15deg);
+  }
+}
+
+.search-pill {
+  height: clamp(2.65rem, 5vh, 3.2rem);
+  padding: 0 clamp(0.95rem, 1.4vw, 1.25rem) 0 clamp(1.1rem, 1.6vw, 1.375rem);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-radius: 999px;
+  background: var(--search-bg);
+  border: 1px solid var(--search-border);
+  font-size: clamp(0.92rem, 1.1vw, 1.05rem);
+  pointer-events: none;
+  user-select: none;
+  animation: fadeIn 500ms ease 1000ms both;
+  transition:
+    background var(--theme-transition),
+    border-color var(--theme-transition);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.search-text-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 18px);
+  mask-image: linear-gradient(90deg, transparent 0, #000 18px);
+}
+
+.search-text-inner {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.5em;
+  will-change: transform;
+}
+
+.tw-char {
+  display: inline-block;
+  white-space: pre;
+  animation: charIn 180ms ease both;
+}
+
+@keyframes charIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.tw-cursor {
+  display: inline-block;
+  width: 1.5px;
+  height: 1.15em;
+  margin-left: 2px;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+.tw-cursor.is-blinking {
+  animation: cursorBlink 900ms steps(1) infinite;
+}
+
+@keyframes cursorBlink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.search-icon {
+  width: clamp(1.15rem, 1.4vw, 1.35rem);
+  height: clamp(1.15rem, 1.4vw, 1.35rem);
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
+.feature-panel {
+  padding: clamp(0.85rem, 1.8vh, 1.15rem) clamp(1rem, 1.6vw, 1.35rem);
+  border-radius: clamp(0.9rem, 1.3vw, 1.125rem);
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  animation: fadeIn 500ms ease 1500ms both;
+  transition:
+    background var(--theme-transition),
+    border-color var(--theme-transition);
+}
+
+.feature-grid {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  row-gap: clamp(0.65rem, 1.4vh, 1rem);
+  column-gap: 0.75rem;
+}
+
+.feature-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: clamp(0.76rem, 0.9vw, 0.825rem);
+  line-height: 1;
+  white-space: nowrap;
+  animation: featureIn 400ms ease both;
+}
+
+.feature-item:nth-child(odd) {
+  justify-self: start;
+}
+
+.feature-item:nth-child(even) {
+  justify-self: end;
+}
+
+.feature-item:nth-child(1) { animation-delay: 2000ms; }
+.feature-item:nth-child(2) { animation-delay: 2250ms; }
+.feature-item:nth-child(3) { animation-delay: 2500ms; }
+.feature-item:nth-child(4) { animation-delay: 2750ms; }
+
+.feature-item svg {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+@keyframes featureIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Sağ Sütun: Temaya Uyumlu Cam Form Kartı
+   -------------------------------------------------------------------------- */
+.platform-right {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.form-card {
+  position: relative;
+  width: 100%;
+  padding: clamp(1.35rem, 2.8vh, 2.25rem) clamp(1.35rem, 2.4vw, 2.25rem);
+  border-radius: clamp(1.5rem, 2.2vw, 2.125rem);
+  background: var(--fc-bg);
+  border: 1px solid var(--fc-border);
+  color: var(--fc-title);
+  box-shadow: var(--fc-shadow);
+  backdrop-filter: blur(22px) saturate(1.15);
+  -webkit-backdrop-filter: blur(22px) saturate(1.15);
+  animation: riseIn 650ms cubic-bezier(0.22, 1, 0.36, 1) 350ms both;
+  transition:
+    background var(--theme-transition),
+    border-color var(--theme-transition),
+    box-shadow var(--theme-transition),
+    color var(--theme-transition);
+}
+
+.form-card::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  width: 6rem;
+  height: 3px;
+  transform: translateX(-50%);
+  border-radius: 0 0 4px 4px;
+  background: linear-gradient(90deg, transparent, var(--primary), transparent);
+  pointer-events: none;
+}
+
+.form-viewport {
+  position: relative;
+  margin: -0.5rem;
+  padding: 0.5rem;
+  transition: height 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.form-viewport.is-animating {
+  overflow: hidden;
+}
+
+.form-view {
+  transition:
+    opacity 250ms ease,
+    transform 250ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 250ms ease;
+}
+
+.form-view.is-leaving {
+  opacity: 0;
+  transform: translateX(-1rem);
+  filter: blur(6px);
+  pointer-events: none;
+}
+
+.form-view.is-entering {
+  opacity: 0;
+  transform: translateX(1rem);
+  filter: blur(6px);
+}
+
+.view-head {
+  text-align: center;
+  margin-bottom: clamp(0.85rem, 1.8vh, 1.4rem);
+}
+
+.view-title {
+  font-size: clamp(1.45rem, 2.1vw, 1.85rem);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--fc-title);
+  transition: color var(--theme-transition);
+}
+
+.view-title:focus {
+  outline: none;
+}
+
+.view-sub {
+  margin-top: clamp(0.25rem, 0.6vh, 0.45rem);
+  font-size: clamp(0.8125rem, 0.95vw, 0.9rem);
+  color: var(--fc-sub);
+  line-height: 1.4;
+  transition: color var(--theme-transition);
+}
+
+.form-card .auth-form {
+  gap: clamp(0.65rem, 1.35vh, 0.95rem);
+}
+
+/* Kayıt formu: alan sayısı arttığı için daha sıkı aralık + iki sütunlu satırlar */
+.form-card #viewRegister .auth-form {
+  gap: clamp(0.5rem, 1vh, 0.75rem);
+}
+
+.form-card .form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(0.5rem, 1vw, 0.75rem);
+}
+
+.form-card .form-row .form-group {
+  min-width: 0;
+}
+
+@media (max-width: 30rem) {
+  .form-card .form-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.form-card .form-label {
+  margin-bottom: clamp(0.25rem, 0.5vh, 0.4rem);
+  padding-left: 0.375rem;
+  font-size: clamp(0.78rem, 0.9vw, 0.85rem);
+  font-weight: 500;
+  color: var(--fc-label);
+  transition: color var(--theme-transition);
+}
+
+.form-card .form-input {
+  height: clamp(2.5rem, 4.6vh, 2.95rem);
+  padding: 0 clamp(0.95rem, 1.3vw, 1.2rem);
+  border-radius: 999px;
+  border: 1px solid var(--fc-input-border);
+  background: var(--fc-input-bg);
+  color: var(--fc-input-text);
+  font-size: clamp(0.85rem, 0.95vw, 0.9375rem);
+  transition:
+    background var(--fast-transition),
+    border-color var(--fast-transition),
+    box-shadow var(--fast-transition),
+    color var(--theme-transition);
+}
+
+.form-card .form-input::placeholder {
+  font-size: clamp(0.78rem, 0.88vw, 0.85rem);
+  color: var(--fc-placeholder);
+}
+
+.form-card .form-input.has-trailing-btn {
+  padding-right: 3rem;
+}
+
+.form-card .form-input:focus {
+  background: var(--fc-input-focus-bg);
+  border-color: var(--fc-focus-border);
+  box-shadow: 0 0 0 4px var(--fc-focus-ring), 0 0 22px var(--fc-focus-ring);
+}
+
+.form-card .form-input:-webkit-autofill {
+  -webkit-text-fill-color: var(--fc-input-text);
+  caret-color: var(--fc-input-text);
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+.form-card .form-input[aria-invalid="true"] {
+  border-color: var(--fc-error);
+  background: var(--fc-error-bg);
+  box-shadow: none;
+}
+
+.form-card .form-input[aria-invalid="true"]:focus {
+  box-shadow: 0 0 0 4px var(--fc-error-bg);
+}
+
+.form-card .form-input.is-valid {
+  border-color: var(--fc-valid-border);
+}
+
+.form-card .password-toggle-btn {
+  right: 0.4rem;
+  width: clamp(2rem, 3.6vh, 2.25rem);
+  height: clamp(2rem, 3.6vh, 2.25rem);
+  border-radius: 50%;
+  color: var(--fc-icon);
+}
+
+.form-card .password-toggle-btn:hover {
+  color: var(--fc-link);
+  background: rgba(189, 12, 71, 0.14);
+}
+
+.form-card .eye-svg {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.form-card .field-hint {
+  margin-top: 0.25rem;
+  padding-left: 0.375rem;
+  font-size: clamp(0.6875rem, 0.78vw, 0.75rem);
+  color: var(--fc-hint);
+}
+
+.form-card .field-error {
+  margin-top: 0.25rem;
+  padding-left: 0.375rem;
+  font-size: clamp(0.6875rem, 0.78vw, 0.75rem);
+  font-weight: 500;
+  color: var(--fc-error);
+}
+
+.form-card .field-status {
+  margin-top: 0.25rem;
+  padding-left: 0.375rem;
+  font-size: clamp(0.6875rem, 0.78vw, 0.75rem);
+}
+
+.form-card .field-status.is-match {
+  color: var(--fc-success);
+}
+
+.form-card .field-status.is-mismatch {
+  color: var(--fc-error);
+}
+
+.form-card .submit-btn {
+  height: clamp(2.65rem, 4.8vh, 3.05rem);
+  margin-top: clamp(0.25rem, 0.7vh, 0.5rem);
+  border-radius: 999px;
+  font-size: clamp(0.875rem, 0.98vw, 0.975rem);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #FFFFFF;
+  background: linear-gradient(135deg, var(--primary-hover) 0%, var(--primary) 55%, var(--primary-active) 100%);
+  box-shadow: 0 10px 24px rgba(189, 12, 71, 0.38);
+}
+
+.form-card .submit-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #E4175F 0%, var(--primary-hover) 55%, var(--primary) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(189, 12, 71, 0.5);
+}
+
+.form-card .submit-btn:active:not(:disabled) {
+  transform: translateY(1px) scale(0.985);
+  box-shadow: 0 5px 12px rgba(189, 12, 71, 0.34);
+}
+
+.form-card .submit-btn:focus-visible {
+  outline: 3px solid var(--fc-focus-ring);
+  outline-offset: 3px;
+}
+
+.form-card .btn-spinner {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.form-card .auth-footer {
+  margin-top: clamp(0.75rem, 1.6vh, 1.25rem);
+  font-size: clamp(0.8rem, 0.9vw, 0.875rem);
+  color: var(--fc-sub);
+  transition: color var(--theme-transition);
+}
+
+.form-card .auth-link {
+  color: var(--fc-link);
+  font-weight: 600;
+}
+
+.form-card .auth-link:hover {
+  color: var(--fc-link-hover);
+}
+
+.form-card .alert-box {
+  margin-bottom: clamp(0.65rem, 1.4vh, 1rem);
+  padding: clamp(0.65rem, 1.25vh, 0.85rem) 1rem;
+  border-radius: 1rem;
+  font-size: clamp(0.78rem, 0.86vw, 0.84rem);
+  line-height: 1.45;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  animation: alertSlideIn 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes alertSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.form-card .alert-box svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  margin-top: 0.1rem;
+}
+
+.form-card #formAlertText {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.form-card .alert-title {
+  font-weight: 600;
+  font-size: clamp(0.82rem, 0.9vw, 0.88rem);
+  letter-spacing: -0.005em;
+  color: var(--fc-title);
+}
+
+.form-card .alert-desc {
+  color: var(--fc-label);
+  font-weight: 400;
+}
+
+/* --------------------------------------------------------------------------
+   Duyarlı Düzen: dar ekranda iki sütun alt alta
+   -------------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  body.auth-page {
+    padding: clamp(3.5rem, 7vh, 4.25rem) clamp(0.75rem, 3vw, 1.5rem) 1.5rem;
+  }
+
+  .platform-main {
+    margin-block: 0;
+  }
+
+  .glass-platform {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    gap: clamp(1.25rem, 3vh, 1.75rem);
+    padding: clamp(1.25rem, 3vw, 1.75rem);
+    border-radius: 1.5rem;
+  }
+
+  .glass-box,
+  .form-card {
+    max-width: 29rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .platform-main {
+    width: 94vw;
+  }
+
+  .glass-platform {
+    padding: 1.125rem;
+  }
+
+  .search-pill {
+    font-size: 0.9rem;
+    padding: 0 0.875rem 0 1.125rem;
+  }
+
+  .feature-item {
+    font-size: 0.75rem;
+    gap: 0.375rem;
+  }
+
+  .form-card {
+    padding: 1.35rem 1.15rem;
+    border-radius: 1.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glass-glare {
+    display: none;
+  }
+}

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="tr" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Atatürk Topluluğu Öğrenci Topluluk Yönetim Platformu — Üye Paneli" />
+  <title>Üye Paneli — Atatürk Topluluğu</title>
+  <link rel="icon" type="image/x-icon" href="./assets/favicon.ico" />
+  <link rel="shortcut icon" type="image/x-icon" href="./assets/favicon.ico" />
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body>
+  <!-- Tam Ekran Atatürk Görseli ve Tema Duyarlı Karartma/Aydınlatma Katmanı -->
+  <div class="bg-stage" aria-hidden="true"></div>
+  <div class="bg-overlay" aria-hidden="true"></div>
+
+  <!-- Sağ Üst Köşe: Animasyonlu Koyu / Açık Tema Geçiş Butonu -->
+  <header class="top-Controls">
+    <button
+      type="button"
+      id="themeToggleBtn"
+      class="theme-toggle-btn"
+      aria-label="Açık temaya geç"
+      aria-pressed="false"
+    >
+      <span class="theme-icon-wrap" aria-hidden="true">
+        <svg
+          class="theme-icon-svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <!-- Güneş Grubu -->
+          <g class="sun-group">
+            <circle cx="12" cy="12" r="4.5" fill="currentColor" fill-opacity="0.18" />
+          </g>
+          <g class="sun-rays">
+            <line x1="12" y1="2" x2="12" y2="4.2" />
+            <line x1="12" y1="19.8" x2="12" y2="22" />
+            <line x1="4.93" y1="4.93" x2="6.49" y2="6.49" />
+            <line x1="17.51" y1="17.51" x2="19.07" y2="19.07" />
+            <line x1="2" y1="12" x2="4.2" y2="12" />
+            <line x1="19.8" y1="12" x2="22" y2="12" />
+            <line x1="4.93" y1="19.07" x2="6.49" y2="17.51" />
+            <line x1="17.51" y1="6.49" x2="19.07" y2="4.93" />
+          </g>
+          <!-- Ay Grubu -->
+          <g class="moon-group">
+            <path
+              d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11Z"
+              fill="currentColor"
+              fill-opacity="0.18"
+            />
+          </g>
+        </svg>
+      </span>
+      <span id="themeToggleText">Koyu Tema</span>
+    </button>
+  </header>
+
+  <!-- Korumalı Üye Paneli Glassmorphism Kartı -->
+  <main id="dashboardView" class="auth-main dashboard-card">
+    <section class="glass-card" aria-labelledby="dashboardWelcomeTitle">
+      <div class="brand-header">
+        <p class="brand-Name">Atatürk Topluluğu</p>
+        <h1 id="dashboardWelcomeTitle" class="auth-title">
+          Hoş geldin — Atatürk Topluluğu Paneli
+        </h1>
+        <p class="auth-subtitle">
+          Üye yönetim, etkinlik takvimi ve organizasyon duyuruları alanına başarıyla giriş yaptınız.
+        </p>
+      </div>
+
+      <!-- Genel Bildirim Kutusu -->
+      <div
+        id="formAlertBox"
+        class="alert-box alert-info"
+        role="status"
+        aria-live="polite"
+        hidden
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="8" x2="12" y2="12" />
+          <line x1="12" y1="16" x2="12.01" y2="16" />
+        </svg>
+        <span id="formAlertText"></span>
+      </div>
+
+      <!-- Üye Bilgileri Kartı (textContent ile doldurulur) -->
+      <div class="user-profile-box" aria-label="Üye Hesap Bilgileri">
+        <div class="profile-row">
+          <span class="profile-label">Kullanıcı Adı</span>
+          <span id="dashboardUsername" class="profile-value">Yükleniyor...</span>
+        </div>
+        <div class="profile-row">
+          <span class="profile-label">E-posta Adresi</span>
+          <span id="dashboardEmail" class="profile-value">Yükleniyor...</span>
+        </div>
+        <div class="profile-row">
+          <span class="profile-label">Topluluk Rolü</span>
+          <span id="dashboardRole" class="role-pill">Üye (member)</span>
+        </div>
+      </div>
+
+      <!-- Çıkış Yap Butonu -->
+      <button type="button" id="logoutBtn" class="submit-btn">
+        <svg
+          class="btn-spinner"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          aria-hidden="true"
+          hidden
+        >
+          <path d="M12 2a10 10 0 0 1 10 10" />
+        </svg>
+        <span class="btn-label">Çıkış Yap</span>
+      </button>
+    </section>
+  </main>
+
+  <!-- Firebase v10.12.0 Compat CDN ve Uygulama Betikleri -->
+  <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script defer src="./js/firebase-config.js"></script>
+  <script defer src="./js/theme.js"></script>
+  <script defer src="./js/ui.js"></script>
+  <script defer src="./js/auth.js"></script>
+</body>
+</html>
