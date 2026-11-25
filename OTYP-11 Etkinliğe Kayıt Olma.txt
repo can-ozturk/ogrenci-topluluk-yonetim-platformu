@@ -1,0 +1,37 @@
+## OTYP-11: Etkinliğe Kayıt Olma
+
+**Üst Öğe:** OTYP-6 Etkinlik Yönetimi
+
+### Kullanıcı Hikayesi
+Bir **öğrenci üye** olarak etkinliğe kayıt olmak istiyorum, böylece yerimi ayırtabileyim.
+
+### Kabul Kriterleri
+- [x] **AC-01 (Kontenjan Kontrolü):** Kontenjan dolduğunda "Kayıt Ol" butonu pasifleşir.
+- [x] **AC-02 (Tekil Kayıt):** Bir üye aynı etkinliğe yalnızca 1 kez kayıt olabilir.
+- [x] **AC-03 (Onay ve Bilet Kodu):** Kayıt başarılı olduğunda onay bildirimi gösterilir ve bilet kodu üretilir.
+
+### Test Senaryoları
+
+**Senaryo 1: Başarılı Kayıt**
+- **Given:** Öğrenci üye giriş yapmıştır ve kontenjanı dolmamış bir etkinliğin sayfasındadır.
+- **When:** "Kayıt Ol" butonuna basar.
+- **Then:** Kayıt oluşturulur, onay bildirimi gösterilir ve bilet kodu üretilir.
+
+**Senaryo 2: Kontenjan Dolu (Hata Durumu)**
+- **Given:** Öğrenci üye, kontenjanı dolmuş bir etkinliğin sayfasındadır.
+- **When:** "Kayıt Ol" butonunu kontrol eder.
+- **Then:** Buton pasiftir ve kayıt oluşturulamaz.
+
+**Senaryo 3: Mükerrer Kayıt (Hata Durumu)**
+- **Given:** Kullanıcı bu etkinliğe daha önce kayıt olmuştur.
+- **When:** Aynı etkinliğe tekrar kayıt olmaya çalışır.
+- **Then:** Sistem işlemi engeller ve yeni kayıt/bilet kodu oluşturulmaz.
+
+### Veri Alanları
+| Alan Adı | Veri Tipi | Zorunlu mu? | Açıklama |
+|---|---|---|---|
+| registration_id | Dize | Evet | Benzersiz kayıt numarası |
+| event_id | Dize | Evet | Etkinliğin ID'si |
+| member_id | Dize | Evet | Kayıt olan öğrenci üyenin ID'si |
+| ticket_code | Dize | Evet | Benzersiz bilet kodu |
+| registered_at | Tarih-saat | Evet | Kayıt tarihi ve saati |
