@@ -1,9 +1,3 @@
-/* ==========================================================================
-   Atatürk Topluluğu — Firebase Yapılandırma Dosyası (js/firebase-config.js)
-   Gerçek Firebase Authentication ve Cloud Firestore bağlantısını başlatır.
-   file:// protokolünde de çalışabilmesi için Auth persistence otomatik ayarlanır.
-   ========================================================================== */
-
 (function (window) {
   "use strict";
 
@@ -43,8 +37,6 @@
         authInstance = window.firebase.auth();
         dbInstance = window.firebase.firestore();
 
-        /* file:// protokolünde tarayıcı web storage kısıtlaması nedeniyle
-           Firebase Auth'un hata vermemesi için bellek içi (NONE) persistence kullanılır */
         if (
           isFileProtocol &&
           authInstance &&

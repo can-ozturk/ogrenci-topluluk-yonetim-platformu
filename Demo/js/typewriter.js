@@ -1,9 +1,3 @@
-/* ==========================================================================
-   Atatürk Topluluğu — Daktilo Animasyonu (js/typewriter.js)
-   Sonsuz döngü: harf harf yaz -> bekle (imleç yanıp söner) -> hızlıca sil
-   -> kısa boşluk -> sonraki ifade. Metinler yalnızca textContent ile yazılır.
-   ========================================================================== */
-
 (function (window, document) {
   "use strict";
 
@@ -15,13 +9,13 @@
     "Yurtta sulh, cihanda sulh."
   ];
 
-  var START_DELAY = 1500; /* alt panel belirirken başlar */
+  var START_DELAY = 1500;
   var TYPE_MIN = 60;
   var TYPE_MAX = 80;
   var HOLD_MS = 500;
   var DELETE_MS = 40;
   var GAP_MS = 250;
-  var STATIC_ROTATE_MS = 4000; /* prefers-reduced-motion */
+  var STATIC_ROTATE_MS = 4000;
 
   function init() {
     var inner = document.getElementById("typewriterText");
@@ -36,7 +30,7 @@
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     function fit() {
-      /* Uzun ifadede son harfler (ve imleç) görünür kalsın */
+
       var over = inner.offsetWidth - wrap.clientWidth;
       inner.style.transform = over > 0 ? "translateX(" + -over + "px)" : "";
     }
@@ -91,7 +85,7 @@
     }
 
     function showStatic() {
-      /* Hareket azaltma tercihi: harf harf animasyon yok, ifade periyodik değişir */
+
       while (inner.firstChild && inner.firstChild !== cursor) {
         inner.removeChild(inner.firstChild);
       }

@@ -1,13 +1,3 @@
-/* ==========================================================================
-   Atatürk Topluluğu — Kimlik Doğrulama ve Firestore İşlemleri (js/auth.js)
-   Güvenlik İlkeleri:
-   - Tüm kayıt ve giriş işlemleri doğrudan Firebase Authentication ve
-     Cloud Firestore / Realtime Database üzerinde gerçekleştirilir.
-   - localStorage üzerinde sahte/yerel kullanıcı tutulmaz.
-   - Şifreler asla console.log veya localStorage'a yazılmaz.
-   - Kullanıcı girdileri yalnızca textContent ile DOM'a aktarılır.
-   ========================================================================== */
-
 (function (window, document) {
   "use strict";
 
@@ -18,22 +8,80 @@
   var DEPARTMENT_REGEX = new RegExp("^[" + LETTERS + "0-9][" + LETTERS + "0-9 .,&()'’/-]*$");
   var STUDENT_NUMBER_REGEX = /^[0-9]{6,12}$/;
 
-  /* Üyelik durumu: Firestore'a makine değeri yazılır, ekranda etiket gösterilir.
-     (Gelecekteki yönetici onay ekranı bu alanı "approved" vb. yapacaktır.) */
   var STATUS_PENDING = "pending";
-  var STATUS_LABELS = { pending: "Beklemede" };
+  var STATUS_APPROVED = "approved";
+  var STATUS_REJECTED = "rejected";
+  var STATUS_SUSPENDED = "suspended";
+  var STATUS_LABELS = {
+    pending: "Beklemede",
+    approved: "Onaylı",
+    rejected: "Reddedildi",
+    suspended: "Askıya Alındı"
+  };
 
-  /* Önceki sürümden kalmış olabilecek yerel test kaydını temizle */
   try {
     window.localStorage.removeItem("ataturk_toplulugu_local_users_v1");
   } catch (e) {}
 
-  /* ------------------------------------------------------------------------
-     Firebase Identity Toolkit REST Yardımcıları
-     (Tarayıcı file:// protokolündeyken Firebase JS SDK web-storage hatası
-      verirse doğrudan resmi Google Identity Toolkit & Firestore REST API
-      üzerinden gerçek Firebase projesine yazar.)
-     ------------------------------------------------------------------------ */
+  var SESSION_STORAGE_KEY = "ataturk_toplulugu_active_session_v1";
+  var WINDOW_NAME_PREFIX = "__ATATURK_SESSION__:";
+
+  function saveAuthSession(session) {
+    if (!session || !session.uid || !session.idToken) return;
+    var payload = JSON.stringify({
+      uid: session.uid,
+      email: session.email || "",
+      displayName: session.displayName || "",
+      idToken: session.idToken,
+      refreshToken: session.refreshToken || "",
+      savedAt: Date.now()
+    });
+    try {
+      window.sessionStorage.setItem(SESSION_STORAGE_KEY, payload);
+    } catch (e) {}
+    try {
+      window.name = WINDOW_NAME_PREFIX + payload;
+    } catch (e) {}
+  }
+
+  function loadAuthSession() {
+    var raw = null;
+    try {
+      raw = window.sessionStorage.getItem(SESSION_STORAGE_KEY);
+    } catch (e) {}
+    if (!raw) {
+      try {
+        if (typeof window.name === "string" && window.name.indexOf(WINDOW_NAME_PREFIX) === 0) {
+          raw = window.name.slice(WINDOW_NAME_PREFIX.length);
+        }
+      } catch (e) {}
+    }
+    if (!raw) return null;
+    try {
+      var data = JSON.parse(raw);
+      if (!data || !data.uid || !data.idToken) return null;
+
+      if (data.savedAt && Date.now() - data.savedAt > 55 * 60 * 1000) {
+        clearAuthSession();
+        return null;
+      }
+      return data;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function clearAuthSession() {
+    try {
+      window.sessionStorage.removeItem(SESSION_STORAGE_KEY);
+    } catch (e) {}
+    try {
+      if (typeof window.name === "string" && window.name.indexOf(WINDOW_NAME_PREFIX) === 0) {
+        window.name = "";
+      }
+    } catch (e) {}
+  }
+
   function mapRestErrorToAuthCode(msg) {
     var m = String(msg || "");
     if (m.indexOf("EMAIL_EXISTS") === 0) return "auth/email-already-in-use";
@@ -83,13 +131,6 @@
       });
   }
 
-  /* ------------------------------------------------------------------------
-     Firestore REST Yardımcıları
-     (Kayıt sırasında profil + benzersizlik kayıtları tek bir atomik "commit"
-      ile yazılır. Her belge için `exists: false` ön koşulu vardır; aynı
-      kullanıcı adı / öğrenci numarası ikinci kez yazılamaz — yarış durumu
-      olsa bile iki istekten yalnızca biri başarılı olur.)
-     ------------------------------------------------------------------------ */
   function makeCodeError(code) {
     var e = new Error(code);
     e.code = code;
@@ -102,7 +143,6 @@
     );
   }
 
-  /* 404 yanıtı: belge yok mu (true), yoksa veritabanının kendisi mi yok (false)? */
   function isDocumentMissing(res) {
     return res
       .json()
@@ -111,11 +151,10 @@
       })
       .then(function (data) {
         var msg = data && data.error && data.error.message ? String(data.error.message) : "";
-        return msg.indexOf("database") === -1;
+        return msg.indexOf("does not exist") === -1;
       });
   }
 
-  /* Belge var mı? true / false döner; belirlenemezse null (atomik yazım yine korur) */
   function firestoreDocExists(cfg, collection, id, idToken) {
     var url =
       "https://firestore.googleapis.com/v1/" +
@@ -144,7 +183,6 @@
       });
   }
 
-  /* Kayıttan önce hızlı ön kontrol (gereksiz Auth hesabı oluşmasını önler) */
   function assertClaimsFree(cfg, profile) {
     return Promise.all([
       firestoreDocExists(cfg, "studentNumbers", profile.studentNumber, null),
@@ -155,7 +193,6 @@
     });
   }
 
-  /* users/{uid} + usernames/{username} + studentNumbers/{no} → tek atomik yazım */
   function commitProfile(cfg, account, profile) {
     var root = firestoreRoot(cfg);
     var uid = account.uid;
@@ -228,39 +265,85 @@
       });
   }
 
-  /* İsteğe bağlı Realtime Database yansıması (başarısızlık kaydı etkilemez) */
-  function mirrorToRealtimeDb(cfg, account, profile) {
-    if (!cfg || !cfg.databaseURL) return Promise.resolve();
-    var rtdbBase = cfg.databaseURL.replace(/\/+$/, "");
-    return window
-      .fetch(
-        rtdbBase +
-          "/users/" +
-          encodeURIComponent(account.uid) +
-          ".json?auth=" +
-          encodeURIComponent(account.idToken),
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            username: profile.username,
-            firstName: profile.firstName,
-            lastName: profile.lastName,
-            studentNumber: profile.studentNumber,
-            department: profile.department,
-            email: profile.email.toLowerCase(),
-            role: "member",
-            status: STATUS_PENDING,
-            createdAt: new Date().toISOString()
-          })
-        }
-      )
-      .catch(function () {});
+  function rtdbRequest(cfg, method, path, idToken, bodyObj) {
+    if (!cfg || !cfg.databaseURL) {
+      return Promise.reject(makeCodeError("rtdb/no-database-url"));
+    }
+    var base = cfg.databaseURL.replace(/\/+$/, "");
+    var cleanPath = String(path || "").replace(/^\/+/, "");
+    var url =
+      base +
+      "/" +
+      cleanPath +
+      ".json" +
+      (idToken ? "?auth=" + encodeURIComponent(idToken) : "");
+
+    var opts = { method: method || "GET" };
+    if (bodyObj !== undefined) {
+      opts.headers = { "Content-Type": "application/json" };
+      opts.body = JSON.stringify(bodyObj);
+    }
+
+    return window.fetch(url, opts).then(function (res) {
+      if (!res.ok) {
+        var err = new Error("RTDB_HTTP_" + res.status);
+        err.code = "rtdb/http-" + res.status;
+        err.status = res.status;
+        throw err;
+      }
+      return res.json().catch(function () {
+        return null;
+      });
+    });
   }
 
-  /* ------------------------------------------------------------------------
-     Birleşik Firebase Kayıt & Giriş İşlemleri (Önce SDK, gerekirse REST)
-     ------------------------------------------------------------------------ */
+  function saveMemberToRealtimeDb(cfg, account, profile) {
+    if (!cfg || !cfg.databaseURL) return Promise.resolve(false);
+    var token = account.idToken;
+    var uid = account.uid;
+    var snoKey = encodeURIComponent(profile.studentNumber);
+    var unameKey = encodeURIComponent(profile.username);
+
+    return Promise.all([
+      rtdbRequest(cfg, "GET", "studentNumbers/" + snoKey, token).catch(function () {
+        return null;
+      }),
+      rtdbRequest(cfg, "GET", "usernames/" + unameKey, token).catch(function () {
+        return null;
+      })
+    ])
+      .then(function (claims) {
+        if (claims[0] && claims[0].uid && claims[0].uid !== uid) {
+          throw makeCodeError("custom/student-number-taken");
+        }
+        if (claims[1] && claims[1].uid && claims[1].uid !== uid) {
+          throw makeCodeError("custom/username-taken");
+        }
+
+        var nowIso = new Date().toISOString();
+        var userRecord = {
+          username: profile.username,
+          firstName: profile.firstName,
+          lastName: profile.lastName,
+          studentNumber: profile.studentNumber,
+          department: profile.department,
+          email: profile.email.toLowerCase(),
+          role: "member",
+          status: STATUS_PENDING,
+          createdAt: nowIso
+        };
+
+        return Promise.all([
+          rtdbRequest(cfg, "PUT", "users/" + encodeURIComponent(uid), token, userRecord),
+          rtdbRequest(cfg, "PUT", "usernames/" + unameKey, token, { uid: uid }),
+          rtdbRequest(cfg, "PUT", "studentNumbers/" + snoKey, token, { uid: uid })
+        ]);
+      })
+      .then(function () {
+        return true;
+      });
+  }
+
   function isSdkEnvironmentError(err) {
     return Boolean(
       err &&
@@ -270,7 +353,6 @@
     );
   }
 
-  /* Auth hesabı oluşturur → { uid, idToken, user (SDK kullanıcısı veya null) } */
   function createAuthAccount(FB, cfg, email, password) {
     var auth = FB && FB.getAuth ? FB.getAuth() : null;
 
@@ -299,11 +381,9 @@
         });
     }
 
-    /* file:// protokolünde veya SDK yoksa doğrudan resmi Firebase REST API */
     return viaRest();
   }
 
-  /* Profil yazılamazsa yetim kalan Auth hesabını siler */
   function deleteAuthAccount(cfg, account) {
     var op = account.user
       ? account.user.delete()
@@ -314,12 +394,12 @@
   }
 
   function signOutQuietly(FB) {
+    clearAuthSession();
     var auth = FB && FB.getAuth ? FB.getAuth() : null;
     if (!auth) return Promise.resolve();
     return Promise.resolve(auth.signOut()).catch(function () {});
   }
 
-  /* Atomik yazım başarısız: çakışmayı tespit et, hesabı temizle, hatayı fırlat */
   function failRegistration(cfg, account, profile, err) {
     return Promise.all([
       firestoreDocExists(cfg, "studentNumbers", profile.studentNumber, account.idToken),
@@ -335,7 +415,6 @@
     });
   }
 
-  /* profile: { firstName, lastName, studentNumber, department, username, email } */
   function registerWithFirebase(FB, profile, password) {
     var cfg = FB && FB.config ? FB.config : window.firebaseConfig;
 
@@ -344,23 +423,32 @@
         return createAuthAccount(FB, cfg, profile.email, password);
       })
       .then(function (account) {
-        return commitProfile(cfg, account, profile)
-          .then(
-            function () {
-              return mirrorToRealtimeDb(cfg, account, profile);
-            },
-            function (err) {
-              return failRegistration(cfg, account, profile, err);
+        return saveMemberToRealtimeDb(cfg, account, profile)
+          .then(function (rtdbSaved) {
+
+            return commitProfile(cfg, account, profile).catch(function (fsErr) {
+              if (!rtdbSaved) throw fsErr;
+            });
+          })
+          .catch(function (err) {
+            if (
+              err &&
+              (err.code === "custom/student-number-taken" ||
+                err.code === "custom/username-taken")
+            ) {
+              return deleteAuthAccount(cfg, account).then(function () {
+                throw err;
+              });
             }
-          )
+            return failRegistration(cfg, account, profile, err);
+          })
           .then(function () {
-            /* Üye "Beklemede" olduğundan kayıt sonrası açık oturum bırakılmaz */
+
             return signOutQuietly(FB);
           });
       });
   }
 
-  /* Giriş → { uid, idToken } */
   function signInWithFirebase(FB, email, password) {
     var cfg = FB && FB.config ? FB.config : window.firebaseConfig;
     var auth = FB && FB.getAuth ? FB.getAuth() : null;
@@ -371,7 +459,13 @@
         { email: email, password: password, returnSecureToken: true },
         cfg.apiKey
       ).then(function (data) {
-        return { uid: data.localId, idToken: data.idToken };
+        return {
+          uid: data.localId,
+          email: data.email || email,
+          displayName: data.displayName || "",
+          idToken: data.idToken,
+          refreshToken: data.refreshToken || ""
+        };
       });
     }
 
@@ -380,7 +474,13 @@
         .signInWithEmailAndPassword(email, password)
         .then(function (cred) {
           return cred.user.getIdToken().then(function (token) {
-            return { uid: cred.user.uid, idToken: token };
+            return {
+              uid: cred.user.uid,
+              email: cred.user.email || email,
+              displayName: cred.user.displayName || "",
+              idToken: token,
+              refreshToken: cred.user.refreshToken || ""
+            };
           });
         })
         .catch(function (err) {
@@ -392,10 +492,24 @@
     return viaRest();
   }
 
-  /* users/{uid}.status değerini okur. Belge/alan yoksa "" (bu özellikten önce
-     açılmış eski hesap). Okuma hatasında hata fırlatır (güvenli tarafta kal). */
   function fetchMemberStatus(cfg, session) {
-    var url =
+    var rtdbPromise = rtdbRequest(
+      cfg,
+      "GET",
+      "users/" + encodeURIComponent(session.uid),
+      session.idToken
+    )
+      .then(function (data) {
+        if (data && typeof data === "object") {
+          return { found: true, status: String(data.status || "") };
+        }
+        return { found: false, status: "" };
+      })
+      .catch(function () {
+        return null;
+      });
+
+    var fsUrl =
       "https://firestore.googleapis.com/v1/" +
       firestoreRoot(cfg) +
       "/users/" +
@@ -403,30 +517,45 @@
       "?key=" +
       encodeURIComponent(cfg.apiKey);
 
-    return window
-      .fetch(url, { headers: { Authorization: "Bearer " + session.idToken } })
+    var fsPromise = window
+      .fetch(fsUrl, { headers: { Authorization: "Bearer " + session.idToken } })
       .then(function (res) {
         if (res.status === 404) {
           return isDocumentMissing(res).then(function (missing) {
-            if (!missing) throw makeCodeError("custom/status-read-failed");
-            return "";
+            if (!missing) return null;
+            return { found: false, status: "" };
           });
         }
-        if (!res.ok) throw makeCodeError("custom/status-read-failed");
+        if (!res.ok) return null;
         return res.json().then(function (data) {
           var f = data && data.fields && data.fields.status;
-          return f && f.stringValue ? f.stringValue : "";
+          return {
+            found: true,
+            status: f && f.stringValue ? f.stringValue : ""
+          };
         });
       })
-      .catch(function (err) {
-        if (err && err.code === "custom/status-read-failed") throw err;
-        throw makeCodeError("custom/status-read-failed");
+      .catch(function () {
+        return null;
       });
+
+    return Promise.all([rtdbPromise, fsPromise]).then(function (results) {
+      var rtdbRes = results[0];
+      var fsRes = results[1];
+
+      if (rtdbRes && rtdbRes.found && rtdbRes.status) {
+        return rtdbRes.status;
+      }
+      if (fsRes && fsRes.found && fsRes.status) {
+        return fsRes.status;
+      }
+      if ((rtdbRes && !rtdbRes.found) || (fsRes && !fsRes.found)) {
+        return "";
+      }
+      throw makeCodeError("custom/status-read-failed");
+    });
   }
 
-  /* ------------------------------------------------------------------------
-     Doğrulama Yardımcıları (Türkçe, Alan Bazlı)
-     ------------------------------------------------------------------------ */
   function normalizeSpaces(rawVal) {
     return String(rawVal || "").replace(/\s+/g, " ").trim();
   }
@@ -539,11 +668,6 @@
     return "";
   }
 
-  /* ------------------------------------------------------------------------
-     Firebase Hata Kodlarını Profesyonel Türkçe Mesajlara Çevirme
-     (Teknik ve veritabanı kaynaklı hatalar kullanıcıya gösterilmez;
-      yalnızca geliştirici konsoluna [F12] yazılır.)
-     ------------------------------------------------------------------------ */
   function logTechnicalError(scope, err) {
     if (typeof console !== "undefined" && typeof console.error === "function") {
       console.error(
@@ -617,7 +741,6 @@
       };
     }
 
-    /* Teknik / yapılandırma / bilinmeyen hatalar: detayı sadece F12 konsola yaz */
     logTechnicalError("Giriş", err);
     return {
       title: "Bilinmeyen Hata",
@@ -654,7 +777,6 @@
       };
     }
 
-    /* Teknik / veritabanı / yapılandırma hataları: detayı sadece F12 konsola yaz */
     logTechnicalError("Kayıt", err);
     return {
       title: "Bilinmeyen Hata",
@@ -662,9 +784,6 @@
     };
   }
 
-  /* ------------------------------------------------------------------------
-     GİRİŞ GÖRÜNÜMÜ BAŞLATMA
-     ------------------------------------------------------------------------ */
   function initLoginPage() {
     var loginForm = document.getElementById("loginForm");
     if (!loginForm) return;
@@ -728,36 +847,72 @@
 
       UI.setButtonLoading(submitBtn, true, "Giriş yapılıyor...", "Giriş Yap");
 
+      function blockLogin(message, type, title) {
+        return signOutQuietly(FB).then(function () {
+          UI.showFormAlert(message, type, title);
+        });
+      }
+
       function handleLoginSuccess(session) {
         return fetchMemberStatus(FB.config, session).then(
           function (status) {
-            UI.setButtonLoading(submitBtn, false, "Giriş yapılıyor...", "Giriş Yap");
             if (passwordInput) {
               passwordInput.value = "";
               UI.clearFieldError(passwordInput, passwordError, false);
             }
 
-            /* Onay bekleyen üye: oturum kapatılır, hiçbir sayfa açılmaz */
-            if (status === STATUS_PENDING) {
-              return signOutQuietly(FB).then(function () {
-                UI.showFormAlert(
-                  "Üyelik başvurunuz yönetim onayı bekliyor. Durumunuz: " +
-                    STATUS_LABELS[STATUS_PENDING] +
-                    ". Onaylandığında giriş yapabileceksiniz.",
-                  "info",
-                  "Başvurunuz " + STATUS_LABELS[STATUS_PENDING]
-                );
-              });
+            if (status === STATUS_APPROVED) {
+              saveAuthSession(session);
+              UI.setButtonLoading(submitBtn, true, "Yönlendiriliyor...", "Giriş Yap");
+              UI.showFormAlert(
+                "Kimlik doğrulaması tamamlandı. Üye paneline yönlendiriliyorsunuz...",
+                "success",
+                "Giriş Başarılı"
+              );
+              window.setTimeout(function () {
+                window.location.href = "./dashboard.html";
+              }, 700);
+              return;
             }
 
-            UI.showFormAlert(
-              "Kimlik doğrulaması tamamlandı. Ana ekran çok yakında hizmetinizde olacak.",
-              "success",
-              "Giriş Başarılı"
+            UI.setButtonLoading(submitBtn, false, "Giriş yapılıyor...", "Giriş Yap");
+
+            if (status === STATUS_PENDING) {
+              return blockLogin(
+                "Üyelik başvurunuz yönetim onayı bekliyor. Başvurunuz onaylandığında giriş yapabileceksiniz.",
+                "info",
+                "Başvurunuz " + STATUS_LABELS[STATUS_PENDING]
+              );
+            }
+
+            if (status === STATUS_REJECTED) {
+              return blockLogin(
+                "Üyelik başvurunuz topluluk yönetimi tarafından onaylanmamıştır. Detaylı bilgi için topluluk yönetimine başvurabilirsiniz.",
+                "error",
+                "Başvurunuz Onaylanmadı"
+              );
+            }
+
+            if (status === STATUS_SUSPENDED) {
+              return blockLogin(
+                "Hesabınız yönetici tarafından askıya alınmıştır. Detaylı bilgi ve destek için lütfen topluluk yöneticisi ile iletişime geçin.",
+                "warning",
+                "Hesabınız Askıya Alındı"
+              );
+            }
+
+            logTechnicalError("Giriş / Profil", {
+              code: "custom/profile-missing",
+              message: "users/" + session.uid + " belgesi yok veya status alanı tanımsız: '" + status + "'"
+            });
+            return blockLogin(
+              "Bu hesaba ait bir üyelik kaydı bulunamadı. Yetkili hesapları için “Yetkili Girişi” bağlantısını kullanın; sorun devam ederse topluluk yönetimine başvurun.",
+              "error",
+              "Üyelik Kaydı Bulunamadı"
             );
           },
           function (err) {
-            /* Durum okunamadı: güvenli tarafta kal, oturumu kapat */
+
             return signOutQuietly(FB).then(function () {
               throw err;
             });
@@ -794,9 +949,6 @@
     });
   }
 
-  /* ------------------------------------------------------------------------
-     KAYIT OL GÖRÜNÜMÜ BAŞLATMA
-     ------------------------------------------------------------------------ */
   function initRegisterPage() {
     var registerForm = document.getElementById("registerForm");
     if (!registerForm) return;
@@ -870,7 +1022,6 @@
       }
     }
 
-    /* Yeni zorunlu alanlar: yazarken hatayı temizle, alandan çıkınca doğrula */
     function bindRequiredField(inputEl, errorEl, validator) {
       if (!inputEl) return;
       inputEl.addEventListener("input", function () {
@@ -985,7 +1136,6 @@
 
       var firstInvalid = null;
 
-      /* Sıra formdaki görünüm sırasıyla aynıdır: ilk hatalı alana odaklanılır */
       [
         [firstNameInput, firstNameError, validateFirstName(firstNameVal)],
         [lastNameInput, lastNameError, validateLastName(lastNameVal)],
@@ -1145,9 +1295,6 @@
     });
   }
 
-  /* ------------------------------------------------------------------------
-     PANEL SAYFASI (dashboard.html) BAŞLATMA
-     ------------------------------------------------------------------------ */
   function initDashboardPage() {
     var dashboardView = document.getElementById("dashboardView");
     if (!dashboardView) return;
@@ -1160,82 +1307,144 @@
 
     var UI = window.AtaturkUI;
     var FB = window.AtaturkFirebase;
+    var cfg = FB && FB.config ? FB.config : window.firebaseConfig;
     var auth = FB && FB.getAuth ? FB.getAuth() : null;
-    var db = FB && FB.getDb ? FB.getDb() : null;
 
-    if (!auth) {
-      window.location.href = "./index.html";
-      return;
+    function leavePanel() {
+      return signOutQuietly(FB).then(function () {
+        window.location.replace("./index.html");
+      });
     }
 
-    auth.onAuthStateChanged(function (user) {
-      if (!user) {
-        window.location.href = "./index.html";
+    function applyMemberProfile(profile, fallbackEmail) {
+      if (!profile || profile.status !== STATUS_APPROVED) {
+        leavePanel();
         return;
       }
 
+      var fullName = [profile.firstName, profile.lastName].filter(Boolean).join(" ");
+      var uname =
+        profile.username || (fallbackEmail ? fallbackEmail.split("@")[0] : "Üye");
+
       if (emailEl) {
-        emailEl.textContent = user.email || "-";
+        emailEl.textContent = profile.email || fallbackEmail || "-";
       }
+      if (welcomeTitle) {
+        welcomeTitle.textContent =
+          "Hoş geldin, " + (fullName || uname) + " — Atatürk Topluluğu Paneli";
+      }
+      if (usernameEl) {
+        usernameEl.textContent = "@" + uname;
+      }
+      if (roleEl) {
+        roleEl.textContent = "Üye (" + STATUS_LABELS[STATUS_APPROVED] + ")";
+      }
+    }
 
-      if (db) {
-        db.collection("users")
-          .doc(user.uid)
-          .get()
-          .then(function (docSnap) {
-            var data = docSnap.exists ? docSnap.data() : null;
-            var uname =
-              data && data.username
-                ? data.username
-                : user.email
-                ? user.email.split("@")[0]
-                : "Üye";
-            var urole = data && data.role ? data.role : "member";
+    function loadProfileViaRest(session) {
+      rtdbRequest(
+        cfg,
+        "GET",
+        "users/" + encodeURIComponent(session.uid),
+        session.idToken
+      )
+        .then(function (rtdbUser) {
+          if (rtdbUser && typeof rtdbUser === "object" && rtdbUser.status) {
+            applyMemberProfile(
+              {
+                firstName: rtdbUser.firstName || "",
+                lastName: rtdbUser.lastName || "",
+                username: rtdbUser.username || "",
+                email: rtdbUser.email || "",
+                status: rtdbUser.status || ""
+              },
+              session.email
+            );
+            return true;
+          }
+          return false;
+        })
+        .catch(function () {
+          return false;
+        })
+        .then(function (handled) {
+          if (handled) return;
 
-            if (welcomeTitle) {
-              welcomeTitle.textContent =
-                "Hoş geldin, " + uname + " — Atatürk Topluluğu Paneli";
-            }
-            if (usernameEl) {
-              usernameEl.textContent = "@" + uname;
-            }
-            if (roleEl) {
-              roleEl.textContent = urole === "member" ? "Üye (member)" : urole;
-            }
+          var url =
+            "https://firestore.googleapis.com/v1/" +
+            firestoreRoot(cfg) +
+            "/users/" +
+            encodeURIComponent(session.uid) +
+            "?key=" +
+            encodeURIComponent(cfg.apiKey);
+
+          return window
+            .fetch(url, { headers: { Authorization: "Bearer " + session.idToken } })
+            .then(function (res) {
+              if (!res.ok) throw makeCodeError("custom/profile-read-failed");
+              return res.json();
+            })
+            .then(function (doc) {
+              var f = (doc && doc.fields) || {};
+              applyMemberProfile(
+                {
+                  firstName: f.firstName && f.firstName.stringValue ? f.firstName.stringValue : "",
+                  lastName: f.lastName && f.lastName.stringValue ? f.lastName.stringValue : "",
+                  username: f.username && f.username.stringValue ? f.username.stringValue : "",
+                  email: f.email && f.email.stringValue ? f.email.stringValue : "",
+                  status: f.status && f.status.stringValue ? f.status.stringValue : ""
+                },
+                session.email
+              );
+            });
+        })
+        .catch(function (err) {
+          logTechnicalError("Panel", err);
+          leavePanel();
+        });
+    }
+
+    function verifyDashboardSession(sdkUser) {
+      if (sdkUser) {
+        sdkUser
+          .getIdToken()
+          .then(function (token) {
+            var session = {
+              uid: sdkUser.uid,
+              email: sdkUser.email || "",
+              idToken: token
+            };
+            saveAuthSession(session);
+            loadProfileViaRest(session);
           })
-          .catch(function () {
-            var fallbackName = user.email ? user.email.split("@")[0] : "Üye";
-            if (welcomeTitle) {
-              welcomeTitle.textContent =
-                "Hoş geldin, " + fallbackName + " — Atatürk Topluluğu Paneli";
-            }
-            if (usernameEl) {
-              usernameEl.textContent = "@" + fallbackName;
-            }
+          .catch(function (err) {
+            logTechnicalError("Panel", err);
+            leavePanel();
           });
+        return;
       }
-    });
+
+      var saved = loadAuthSession();
+      if (saved && saved.uid && saved.idToken) {
+        loadProfileViaRest(saved);
+        return;
+      }
+
+      window.location.replace("./index.html");
+    }
+
+    if (auth && !FB.isFileProtocol) {
+      auth.onAuthStateChanged(verifyDashboardSession);
+    } else {
+      verifyDashboardSession(null);
+    }
 
     if (logoutBtn) {
       logoutBtn.addEventListener("click", function () {
         UI.setButtonLoading(logoutBtn, true, "Çıkış yapılıyor...", "Çıkış Yap");
-        auth
-          .signOut()
-          .then(function () {
-            window.location.href = "./index.html";
-          })
-          .catch(function () {
-            UI.setButtonLoading(
-              logoutBtn,
-              false,
-              "Çıkış yapılıyor...",
-              "Çıkış Yap"
-            );
-            UI.showFormAlert(
-              "Çıkış yapılırken bir sorun oluştu. Lütfen tekrar deneyin.",
-              "error"
-            );
-          });
+        signOutQuietly(FB).then(function () {
+          window.location.href = "./index.html";
+        });
       });
     }
   }
@@ -1251,4 +1460,27 @@
   } else {
     initAll();
   }
+
+  window.AtaturkAuth = {
+    STATUS: {
+      PENDING: STATUS_PENDING,
+      APPROVED: STATUS_APPROVED,
+      REJECTED: STATUS_REJECTED,
+      SUSPENDED: STATUS_SUSPENDED
+    },
+    STATUS_LABELS: STATUS_LABELS,
+    validateEmail: validateEmail,
+    validateLoginPassword: validateLoginPassword,
+    mapLoginErrorToTurkish: mapLoginErrorToTurkish,
+    logTechnicalError: logTechnicalError,
+    signInWithFirebase: signInWithFirebase,
+    signOutQuietly: signOutQuietly,
+    firebaseRestAuth: firebaseRestAuth,
+    rtdbRequest: rtdbRequest,
+    firestoreRoot: firestoreRoot,
+    isDocumentMissing: isDocumentMissing,
+    saveAuthSession: saveAuthSession,
+    loadAuthSession: loadAuthSession,
+    clearAuthSession: clearAuthSession
+  };
 })(window, document);

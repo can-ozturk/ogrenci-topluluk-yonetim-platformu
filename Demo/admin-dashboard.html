@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="tr" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Atatürk Topluluğu Öğrenci Topluluk Yönetim Platformu — Yetkili Paneli" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Yetkili Paneli — Atatürk Topluluğu</title>
+  <link rel="icon" type="image/x-icon" href="./assets/favicon.ico" />
+  <link rel="shortcut icon" type="image/x-icon" href="./assets/favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./css/style.css" />
+  <link rel="stylesheet" href="./css/admin.css" />
+</head>
+<body class="admin-page">
+  <div class="bg-stage" aria-hidden="true"></div>
+  <div class="bg-overlay" aria-hidden="true"></div>
+
+  <div class="admin-gate" id="adminGate" role="status" aria-live="polite">
+    <svg class="btn-spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+      <path d="M12 2a10 10 0 0 1 10 10" />
+    </svg>
+    <span>Yetki doğrulanıyor...</span>
+  </div>
+
+  <div class="admin-shell" id="adminShell" hidden>
+
+    <header class="admin-topbar">
+      <div class="topbar-title">
+        <p class="topbar-eyebrow">Yetkili Paneli</p>
+        <h1 class="topbar-heading" id="adminViewTitle">Üyelik Yönetimi</h1>
+      </div>
+
+      <div class="topbar-actions">
+        <div class="admin-chip" aria-label="Oturum açan yetkili">
+          <span class="admin-avatar" id="adminAvatar" aria-hidden="true">Y</span>
+          <span class="admin-chip-text">
+            <span class="admin-chip-name" id="adminName">Yetkili</span>
+            <span class="admin-chip-role">Yetkili</span>
+          </span>
+        </div>
+
+        <button
+          type="button"
+          id="themeToggleBtn"
+          class="theme-toggle-btn"
+          aria-label="Açık temaya geç"
+          aria-pressed="false"
+        >
+          <span class="theme-icon-wrap" aria-hidden="true">
+            <svg class="theme-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <g class="sun-group">
+                <circle cx="12" cy="12" r="4.5" fill="currentColor" fill-opacity="0.18" />
+              </g>
+              <g class="sun-rays">
+                <line x1="12" y1="2" x2="12" y2="4.2" />
+                <line x1="12" y1="19.8" x2="12" y2="22" />
+                <line x1="4.93" y1="4.93" x2="6.49" y2="6.49" />
+                <line x1="17.51" y1="17.51" x2="19.07" y2="19.07" />
+                <line x1="2" y1="12" x2="4.2" y2="12" />
+                <line x1="19.8" y1="12" x2="22" y2="12" />
+                <line x1="4.93" y1="19.07" x2="6.49" y2="17.51" />
+                <line x1="17.51" y1="6.49" x2="19.07" y2="4.93" />
+              </g>
+              <g class="moon-group">
+                <path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11Z" fill="currentColor" fill-opacity="0.18" />
+              </g>
+            </svg>
+          </span>
+          <span id="themeToggleText">Koyu Tema</span>
+        </button>
+
+        <button type="button" id="adminLogoutBtn" class="admin-btn admin-btn--ghost">
+          <svg class="btn-spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true" hidden>
+            <path d="M12 2a10 10 0 0 1 10 10" />
+          </svg>
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <path d="m16 17 5-5-5-5" />
+            <path d="M21 12H9" />
+          </svg>
+          <span class="btn-label">Çıkış Yap</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="admin-main" id="adminMain">
+
+      <div id="formAlertBox" class="alert-box alert-error" role="alert" aria-live="polite" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="8" x2="12" y2="12" />
+          <line x1="12" y1="16" x2="12.01" y2="16" />
+        </svg>
+        <span id="formAlertText"></span>
+      </div>
+
+      <section class="admin-view" id="panelOverview" aria-labelledby="overviewWelcomeTitle">
+
+        <article class="bento-card overview-hero-card">
+          <div class="overview-hero-top">
+            <span class="overview-badge">Atatürk Topluluğu · Yönetim Merkezi</span>
+            <h2 class="overview-welcome-title" id="overviewWelcomeTitle">Panele Hoş Geldiniz</h2>
+            <p class="overview-welcome-sub">
+              Topluluk yönetimi, üyelik başvuruları ve etkinlik süreçlerini bu panelden güvenle takip edebilirsiniz.
+            </p>
+          </div>
+
+          <div class="overview-quote-box" aria-live="off">
+            <svg class="overview-quote-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z" />
+              <path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z" />
+            </svg>
+            <div class="overview-quote-body">
+              <p class="overview-quote-text">
+                <span id="overviewTypewriterText"><span class="overview-tw-cursor" id="overviewTypewriterCursor" aria-hidden="true"></span></span>
+              </p>
+              <p class="overview-quote-author">— Mustafa Kemal Atatürk</p>
+            </div>
+          </div>
+        </article>
+
+        <div class="overview-grid">
+
+          <article class="bento-card overview-card" aria-labelledby="overviewInfoTitle">
+            <header class="overview-card-head">
+              <span class="kpi-icon overview-card-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </span>
+              <div>
+                <h3 class="members-title" id="overviewInfoTitle">Yetkili Bilgileri</h3>
+                <p class="members-meta">Hesap özetinizi görüntüleyin ve ad soyad bilginizi tanımlayın.</p>
+              </div>
+            </header>
+
+            <dl class="overview-meta-list">
+              <div class="overview-meta-row">
+                <dt>Adı Soyadı</dt>
+                <dd id="overviewFullNameValue">Henüz tanımlanmadı</dd>
+              </div>
+              <div class="overview-meta-row">
+                <dt>E-posta Adresi</dt>
+                <dd id="overviewEmailValue">—</dd>
+              </div>
+              <div class="overview-meta-row">
+                <dt>Yetki / Rol</dt>
+                <dd><span class="overview-role-pill" id="overviewRoleValue">Yetkili</span></dd>
+              </div>
+            </dl>
+
+            <form id="adminProfileForm" class="overview-form" novalidate>
+              <div class="event-fields-row">
+                <div class="event-field">
+                  <label for="adminFirstName" class="event-label">Adı</label>
+                  <input
+                    type="text"
+                    id="adminFirstName"
+                    name="firstName"
+                    class="event-input"
+                    placeholder="Adınız"
+                    autocomplete="given-name"
+                    maxlength="40"
+                    required
+                    aria-invalid="false"
+                    aria-describedby="adminFirstNameError"
+                  />
+                  <p id="adminFirstNameError" class="field-error" role="alert" aria-live="polite" hidden></p>
+                </div>
+
+                <div class="event-field">
+                  <label for="adminLastName" class="event-label">Soyadı</label>
+                  <input
+                    type="text"
+                    id="adminLastName"
+                    name="lastName"
+                    class="event-input"
+                    placeholder="Soyadınız"
+                    autocomplete="family-name"
+                    maxlength="40"
+                    required
+                    aria-invalid="false"
+                    aria-describedby="adminLastNameError"
+                  />
+                  <p id="adminLastNameError" class="field-error" role="alert" aria-live="polite" hidden></p>
+                </div>
+              </div>
+
+              <div class="overview-form-actions">
+                <button type="submit" id="adminProfileSubmitBtn" class="admin-btn admin-btn--primary event-submit-btn">
+                  <svg class="btn-spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true" hidden>
+                    <path d="M12 2a10 10 0 0 1 10 10" />
+                  </svg>
+                  <span class="btn-label">Ad Soyad Kaydet</span>
+                </button>
+              </div>
+            </form>
+          </article>
+
+          <article class="bento-card overview-card" aria-labelledby="overviewPasswordTitle">
+            <header class="overview-card-head">
+              <span class="kpi-icon overview-card-icon overview-card-icon--warn" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+              </span>
+              <div>
+                <h3 class="members-title" id="overviewPasswordTitle">Şifre Değiştirme</h3>
+                <p class="members-meta">Hesap güvenliğiniz için mevcut şifrenizi doğrulayarak yeni şifre belirleyin.</p>
+              </div>
+            </header>
+
+            <form id="adminPasswordForm" class="overview-form" novalidate>
+              <div class="event-field">
+                <label for="overviewCurrentPassword" class="event-label">Mevcut Şifre</label>
+                <div class="input-wrapper">
+                  <input
+                    type="password"
+                    id="overviewCurrentPassword"
+                    name="currentPassword"
+                    class="event-input has-trailing-btn"
+                    placeholder="Mevcut şifrenizi girin"
+                    autocomplete="current-password"
+                    required
+                    aria-invalid="false"
+                    aria-describedby="overviewCurrentPasswordError"
+                  />
+                  <button
+                    type="button"
+                    class="password-toggle-btn overview-pw-toggle"
+                    data-toggle-password="overviewCurrentPassword"
+                    data-visible="false"
+                    aria-label="Şifreyi göster"
+                    aria-pressed="false"
+                  >
+                    <svg class="eye-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path class="eye-lid" d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z" />
+                      <circle class="eye-pupil" cx="12" cy="12" r="3" />
+                      <line class="eye-slash" x1="3" y1="3" x2="21" y2="21" />
+                    </svg>
+                  </button>
+                </div>
+                <p id="overviewCurrentPasswordError" class="field-error" role="alert" aria-live="polite" hidden></p>
+              </div>
+
+              <div class="event-field">
+                <label for="overviewNewPassword" class="event-label">Yeni Şifre</label>
+                <div class="input-wrapper">
+                  <input
+                    type="password"
+                    id="overviewNewPassword"
+                    name="newPassword"
+                    class="event-input has-trailing-btn"
+                    placeholder="En az 8 karakter, 1 harf ve 1 rakam"
+                    autocomplete="new-password"
+                    required
+                    aria-invalid="false"
+                    aria-describedby="overviewNewPasswordError"
+                  />
+                  <button
+                    type="button"
+                    class="password-toggle-btn overview-pw-toggle"
+                    data-toggle-password="overviewNewPassword"
+                    data-visible="false"
+                    aria-label="Şifreyi göster"
+                    aria-pressed="false"
+                  >
+                    <svg class="eye-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path class="eye-lid" d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z" />
+                      <circle class="eye-pupil" cx="12" cy="12" r="3" />
+                      <line class="eye-slash" x1="3" y1="3" x2="21" y2="21" />
+                    </svg>
+                  </button>
+                </div>
+                <p id="overviewNewPasswordError" class="field-error" role="alert" aria-live="polite" hidden></p>
+              </div>
+
+              <div class="event-field">
+                <label for="overviewConfirmPassword" class="event-label">Yeni Şifre (Tekrar)</label>
+                <div class="input-wrapper">
+                  <input
+                    type="password"
+                    id="overviewConfirmPassword"
+                    name="confirmPassword"
+                    class="event-input has-trailing-btn"
+                    placeholder="Yeni şifrenizi tekrar girin"
+                    autocomplete="new-password"
+                    required
+                    aria-invalid="false"
+                    aria-describedby="overviewConfirmPasswordError"
+                  />
+                  <button
+                    type="button"
+                    class="password-toggle-btn overview-pw-toggle"
+                    data-toggle-password="overviewConfirmPassword"
+                    data-visible="false"
+                    aria-label="Şifreyi göster"
+                    aria-pressed="false"
+                  >
+                    <svg class="eye-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path class="eye-lid" d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z" />
+                      <circle class="eye-pupil" cx="12" cy="12" r="3" />
+                      <line class="eye-slash" x1="3" y1="3" x2="21" y2="21" />
+                    </svg>
+                  </button>
+                </div>
+                <p id="overviewConfirmPasswordError" class="field-error" role="alert" aria-live="polite" hidden></p>
+              </div>
+
+              <div class="overview-form-actions">
+                <button type="submit" id="adminPasswordSubmitBtn" class="admin-btn admin-btn--primary event-submit-btn">
+                  <svg class="btn-spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true" hidden>
+                    <path d="M12 2a10 10 0 0 1 10 10" />
+                  </svg>
+                  <span class="btn-label">Şifreyi Güncelle</span>
+                </button>
+              </div>
+            </form>
+          </article>
+        </div>
+      </section>
+
+      <section class="admin-view" id="panelMembers" aria-labelledby="adminViewTitle" hidden>
+
+        <div class="kpi-grid">
+          <article class="bento-card kpi-card kpi-card--accent">
+            <span class="kpi-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+            </span>
+            <p class="kpi-label">Toplam Üye</p>
+            <p class="kpi-value" id="kpiTotal">–</p>
+            <p class="kpi-foot">Tüm kayıtlı hesaplar</p>
+          </article>
+
+          <article class="bento-card kpi-card kpi-card--warning">
+            <span class="kpi-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 6v6l4 2" />
+              </svg>
+            </span>
+            <p class="kpi-label">Onay Bekleyen Başvurular</p>
+            <p class="kpi-value" id="kpiPending">–</p>
+            <p class="kpi-foot">İşlem bekliyor</p>
+          </article>
+
+          <article class="bento-card kpi-card kpi-card--success">
+            <span class="kpi-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                <path d="m9 11 3 3L22 4" />
+              </svg>
+            </span>
+            <p class="kpi-label">Onaylı Üyeler</p>
+            <p class="kpi-value" id="kpiApproved">–</p>
+            <p class="kpi-foot">Aktif üyelik</p>
+          </article>
+
+          <article class="bento-card kpi-card kpi-card--danger">
+            <span class="kpi-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <path d="m4.9 4.9 14.2 14.2" />
+              </svg>
+            </span>
+            <p class="kpi-label">Askıya Alınan Hesaplar</p>
+            <p class="kpi-value" id="kpiSuspended">–</p>
+            <p class="kpi-foot">Girişi kapalı</p>
+          </article>
+        </div>
+
+        <article class="bento-card members-card" aria-labelledby="membersTitle">
+          <header class="members-head">
+            <div>
+              <h2 class="members-title" id="membersTitle">Kayıtlı Üyeler</h2>
+              <p class="members-meta" id="membersMeta">En yeni kayıtlar en üstte listelenir.</p>
+            </div>
+
+            <div class="search-field">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.3-4.3" />
+              </svg>
+              <input
+                type="search"
+                id="memberSearch"
+                class="search-input"
+                placeholder="Ad, soyad, kullanıcı adı veya e-posta ara"
+                aria-label="Üyelerde ara: ad, soyad, kullanıcı adı veya e-posta"
+                autocomplete="off"
+                spellcheck="false"
+              />
+            </div>
+          </header>
+
+          <div class="filter-pills" role="group" aria-label="Duruma göre filtrele">
+            <button type="button" class="filter-pill is-active" data-filter="all" aria-pressed="true">
+              Tümü <span class="pill-count" data-count="all">0</span>
+            </button>
+            <button type="button" class="filter-pill" data-filter="pending" aria-pressed="false">
+              Onay Bekleyenler <span class="pill-count" data-count="pending">0</span>
+            </button>
+            <button type="button" class="filter-pill" data-filter="approved" aria-pressed="false">
+              Onaylı <span class="pill-count" data-count="approved">0</span>
+            </button>
+            <button type="button" class="filter-pill" data-filter="suspended" aria-pressed="false">
+              Askıya Alınanlar <span class="pill-count" data-count="suspended">0</span>
+            </button>
+            <button type="button" class="filter-pill" data-filter="rejected" aria-pressed="false">
+              Reddedilenler <span class="pill-count" data-count="rejected">0</span>
+            </button>
+          </div>
+
+          <div class="member-list-head" aria-hidden="true">
+            <span>Üye</span>
+            <span>E-posta</span>
+            <span>Kayıt Tarihi</span>
+            <span>Durum</span>
+            <span class="head-actions">İşlemler</span>
+          </div>
+
+          <div class="member-loading" id="memberLoading" role="status">
+            <svg class="btn-spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+              <path d="M12 2a10 10 0 0 1 10 10" />
+            </svg>
+            <span>Üyeler yükleniyor...</span>
+          </div>
+
+          <ul class="member-list" id="memberList" aria-label="Üye listesi"></ul>
+
+          <div class="member-empty" id="memberEmpty" hidden>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.3-4.3" />
+              <path d="M8 11h6" />
+            </svg>
+            <p id="memberEmptyText">Gösterilecek üye bulunamadı.</p>
+          </div>
+        </article>
+      </section>
+
+      <section class="admin-view" id="panelEvents" aria-labelledby="eventsCreateHeading" hidden>
+
+        <article class="bento-card event-create-card">
+          <header class="members-head">
+            <div>
+              <h2 class="members-title" id="eventsCreateHeading">Yeni Etkinlik Oluştur</h2>
+              <p class="members-meta">Fotoğraf, tarih ve açıklamayı eksiksiz doldurarak etkinliği yayınlayın.</p>
+            </div>
+          </header>
+
+          <form id="eventCreateForm" class="event-form" novalidate>
+            <div class="event-form-grid">
+
+              <div class="event-photo-col">
+                <label for="eventPhoto" class="event-label">Etkinlik Fotoğrafı</label>
+                <div class="photo-dropzone" id="eventPhotoDropzone">
+                  <input
+                    type="file"
+                    id="eventPhoto"
+                    name="eventPhoto"
+                    class="photo-input-sr"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    required
+                    aria-invalid="false"
+                    aria-describedby="eventPhotoHint eventPhotoError"
+                  />
+
+                  <label for="eventPhoto" class="photo-placeholder" id="eventPhotoPlaceholder">
+                    <span class="photo-upload-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="3" />
+                        <circle cx="8.5" cy="8.5" r="1.5" />
+                        <path d="m21 15-5-5L5 21" />
+                      </svg>
+                    </span>
+                    <span class="photo-placeholder-title">Fotoğraf Seç</span>
+                    <span class="photo-placeholder-sub">JPG, PNG veya WebP (maks. 5 MB)</span>
+                  </label>
+
+                  <div class="photo-preview-wrap" id="eventPhotoPreviewWrap" hidden>
+                    <img id="eventPhotoPreview" class="photo-preview-img" alt="Seçilen etkinlik fotoğrafı önizlemesi" />
+                    <div class="photo-preview-bar">
+                      <span class="photo-file-name" id="eventPhotoName"></span>
+                      <button
+                        type="button"
+                        id="eventPhotoClearBtn"
+                        class="admin-btn admin-btn--danger photo-clear-btn"
+                        aria-label="Seçili fotoğrafı kaldır"
+                      >
+                        Kaldır
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <p id="eventPhotoHint" class="field-hint">Yatay (16:9) görseller etkinlik kartlarında en iyi görünümü verir.</p>
+                <p id="eventPhotoError" class="field-error" role="alert" aria-live="polite" hidden></p>
+              </div>
+
+              <div class="event-fields-col">
+                <div class="event-field">
+                  <label for="eventTitle" class="event-label">Etkinlik Adı</label>
+                  <input
+                    type="text"
+                    id="eventTitle"
+                    name="eventTitle"
+                    class="event-input"
+                    placeholder="Örn. 19 Mayıs Gençlik ve Kültür Buluşması"
+                    maxlength="120"
+                    required
+                    aria-invalid="false"
+                    aria-describedby="eventTitleError"
+                  />
+                  <p id="eventTitleError" class="field-error" role="alert" aria-live="polite" hidden></p>
+                </div>
+
+                <div class="event-fields-row">
+                  <div class="event-field">
+                    <label for="eventCreatorName" class="event-label">Etkinliği Oluşturan (Ad Soyad)</label>
+                    <input
+                      type="text"
+                      id="eventCreatorName"
+                      name="eventCreatorName"
+                      class="event-input"
+                      placeholder="Adınız Soyadınız"
+                      maxlength="80"
+                      required
+                      aria-invalid="false"
+                      aria-describedby="eventCreatorNameError"
+                    />
+                    <p id="eventCreatorNameError" class="field-error" role="alert" aria-live="polite" hidden></p>
+                  </div>
+
+                  <div class="event-field">
+                    <label for="eventDate" class="event-label">Etkinlik Tarihi</label>
+                    <input
+                      type="date"
+                      id="eventDate"
+                      name="eventDate"
+                      class="event-input event-date-input"
+                      required
+                      aria-invalid="false"
+                      aria-describedby="eventDateHint eventDateError"
+                    />
+                    <p id="eventDateHint" class="field-hint">Takvimden bugünden ileri bir tarih seçin.</p>
+                    <p id="eventDateError" class="field-error" role="alert" aria-live="polite" hidden></p>
+                  </div>
+                </div>
+
+                <div class="event-field">
+                  <label for="eventDescription" class="event-label">Etkinlik Açıklaması</label>
+                  <textarea
+                    id="eventDescription"
+                    name="eventDescription"
+                    class="event-textarea"
+                    rows="4"
+                    maxlength="1200"
+                    placeholder="Etkinlik programı, konum ve katılım detaylarını yazın..."
+                    required
+                    aria-invalid="false"
+                    aria-describedby="eventDescriptionError"
+                  ></textarea>
+                  <p id="eventDescriptionError" class="field-error" role="alert" aria-live="polite" hidden></p>
+                </div>
+
+                <div class="event-form-actions">
+                  <button type="button" id="eventCancelEditBtn" class="admin-btn admin-btn--ghost event-cancel-btn" hidden>
+                    Vazgeç
+                  </button>
+                  <button type="submit" id="eventSubmitBtn" class="admin-btn admin-btn--primary event-submit-btn">
+                    <svg class="btn-spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true" hidden>
+                      <path d="M12 2a10 10 0 0 1 10 10" />
+                    </svg>
+                    <span class="btn-label">Etkinlik Oluştur</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </article>
+
+        <article class="bento-card event-feed-card" aria-labelledby="eventsFeedHeading">
+          <header class="members-head">
+            <div>
+              <h2 class="members-title" id="eventsFeedHeading">Yayınlanan Etkinlikler</h2>
+              <p class="members-meta" id="eventsMeta">Etkinlik kartının üzerine gelerek katılım durumunu görüntüleyebilirsiniz.</p>
+            </div>
+          </header>
+
+          <div class="member-loading" id="eventLoading" role="status">
+            <svg class="btn-spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+              <path d="M12 2a10 10 0 0 1 10 10" />
+            </svg>
+            <span>Etkinlikler yükleniyor...</span>
+          </div>
+
+          <div class="event-blog-grid" id="eventFeedList" aria-label="Etkinlik akışı"></div>
+
+          <div class="member-empty" id="eventEmpty" hidden>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="4" width="18" height="18" rx="2" />
+              <path d="M16 2v4" />
+              <path d="M8 2v4" />
+              <path d="M3 10h18" />
+            </svg>
+            <p id="eventEmptyText">Henüz oluşturulmuş bir etkinlik bulunmuyor.</p>
+          </div>
+        </article>
+      </section>
+
+      <section class="admin-view" id="panelBudget" aria-labelledby="budgetHeading" hidden>
+
+        <article class="bento-card budget-hero-card">
+          <header class="budget-hero-head">
+            <div>
+              <span class="overview-badge">Muhasebe · Kasa Özeti</span>
+              <h2 class="overview-welcome-title" id="budgetHeading">Genel Bakiye</h2>
+              <p class="members-meta" id="budgetMeta">
+                Her para birimi kendi kasasında takip edilir. İşlem yaptığınızda bakiye anlık güncellenir.
+              </p>
+            </div>
+
+            <div class="budget-action-bar">
+              <button type="button" id="openIncomeModalBtn" class="admin-btn admin-btn--approve budget-cta-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+                <span>Bakiye Girişi Yap</span>
+              </button>
+
+              <button type="button" id="openExpenseModalBtn" class="admin-btn admin-btn--danger budget-cta-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+                <span>Bakiye Çıkışı</span>
+              </button>
+
+              <button type="button" id="openHistoryModalBtn" class="admin-btn admin-btn--ghost budget-cta-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
+                <span>Hareketleri Görüntüle</span>
+              </button>
+            </div>
+          </header>
+
+          <div class="budget-balance-grid" id="budgetBalanceGrid" aria-live="polite">
+            <div class="budget-balance-card" data-currency="TL">
+              <div class="budget-balance-top">
+                <span class="budget-currency-pill">TL · Türk Lirası</span>
+              </div>
+              <p class="budget-balance-amount" data-balance-currency="TL">0,00 TL</p>
+              <div class="budget-balance-sub">
+                <span class="budget-sub-in" data-income-currency="TL">Giriş: 0,00 TL</span>
+                <span class="budget-sub-out" data-expense-currency="TL">Çıkış: 0,00 TL</span>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="bento-card budget-recent-card" aria-labelledby="budgetRecentHeading">
+          <header class="members-head">
+            <div>
+              <h3 class="members-title" id="budgetRecentHeading">Son Bütçe Hareketleri</h3>
+              <p class="members-meta" id="budgetRecentMeta">En son kaydedilen gelir ve gider işlemleri.</p>
+            </div>
+            <button type="button" id="openHistoryFromRecentBtn" class="admin-btn admin-btn--ghost">
+              Tümünü Gör
+            </button>
+          </header>
+
+          <div class="member-loading" id="budgetLoading" role="status">
+            <svg class="btn-spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+              <path d="M12 2a10 10 0 0 1 10 10" />
+            </svg>
+            <span>Bütçe verileri yükleniyor...</span>
+          </div>
+
+          <ul class="budget-tx-list" id="budgetRecentList" aria-label="Son bütçe hareketleri"></ul>
+
+          <div class="member-empty" id="budgetRecentEmpty" hidden>
+            <p>Henüz kaydedilmiş bir gelir veya gider hareketi bulunmuyor.</p>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <aside class="admin-sidebar" aria-label="Yetkili menüsü">
+      <div class="sidebar-brand">
+        <span class="brand-mark" aria-hidden="true">A</span>
+        <div>
+          <p class="brand-title">Atatürk Topluluğu</p>
+          <p class="brand-sub">Yönetim Paneli</p>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="Panel bölümleri">
+        <ul>
+          <li>
+            <button type="button" class="nav-item" data-panel="overview">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="3" y="3" width="7" height="9" rx="1.5" />
+                <rect x="14" y="3" width="7" height="5" rx="1.5" />
+                <rect x="14" y="12" width="7" height="9" rx="1.5" />
+                <rect x="3" y="16" width="7" height="5" rx="1.5" />
+              </svg>
+              <span class="nav-label">Genel Bakış</span>
+            </button>
+          </li>
+          <li data-authority="uyelik-yonetimi" hidden>
+            <button type="button" class="nav-item" data-panel="members">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="m16 11 2 2 4-4" />
+              </svg>
+              <span class="nav-label">Üyelik Yönetimi</span>
+              <span class="nav-count" id="navPendingCount" title="Onay bekleyen başvuru" hidden>0</span>
+            </button>
+          </li>
+          <li data-authority="muhasebe" hidden>
+            <button type="button" class="nav-item" data-panel="budget">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="2" y="5" width="20" height="14" rx="2" />
+                <line x1="2" y1="10" x2="22" y2="10" />
+                <line x1="6" y1="15" x2="10" y2="15" />
+              </svg>
+              <span class="nav-label">Bütçe Yönetimi</span>
+            </button>
+          </li>
+          <li data-authority="etkinlik-yonetimi" hidden>
+            <button type="button" class="nav-item" data-panel="events">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="3" y="4" width="18" height="18" rx="2" />
+                <path d="M16 2v4" />
+                <path d="M8 2v4" />
+                <path d="M3 10h18" />
+              </svg>
+              <span class="nav-label">Etkinlik Yönetimi</span>
+              <span class="nav-count" id="navEventsCount" title="Toplam etkinlik" hidden>0</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+
+      <p class="sidebar-foot">Yalnızca hesabınıza tanımlı yetki modülünü görüntüleyebilirsiniz.</p>
+    </aside>
+  </div>
+
+  <dialog class="admin-dialog" id="confirmDialog" aria-labelledby="confirmTitle" aria-describedby="confirmMessage">
+    <form method="dialog" class="dialog-body">
+      <span class="dialog-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+          <line x1="12" y1="9" x2="12" y2="13" />
+          <line x1="12" y1="17" x2="12.01" y2="17" />
+        </svg>
+      </span>
+      <h2 class="dialog-title" id="confirmTitle">İşlemi onaylayın</h2>
+      <p class="dialog-message" id="confirmMessage"></p>
+      <p class="dialog-note" id="confirmNote" hidden></p>
+      <div class="dialog-actions">
+        <button type="submit" value="cancel" class="admin-btn admin-btn--ghost" id="confirmCancelBtn">Vazgeç</button>
+        <button type="submit" value="confirm" class="admin-btn admin-btn--primary" id="confirmOkBtn">Onayla</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="admin-dialog status-dialog" id="eventStatusDialog" aria-labelledby="eventStatusTitle">
+    <div class="status-dialog-body">
+      <header class="status-dialog-head">
+        <div>
+          <p class="topbar-eyebrow">Katılım Durumu</p>
+          <h2 class="dialog-title" id="eventStatusTitle">Etkinlik</h2>
+          <p class="status-dialog-sub" id="eventStatusSub"></p>
+        </div>
+        <button type="button" class="admin-btn admin-btn--ghost admin-btn--icon" id="eventStatusCloseBtn" aria-label="Pencereyi kapat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </header>
+
+      <div class="status-tabs" role="tablist" aria-label="Katılım yanıtları">
+        <button
+          type="button"
+          class="status-tab is-active"
+          id="tabAttending"
+          role="tab"
+          aria-selected="true"
+          data-status-tab="attending"
+        >
+          <span>Katılanlar (Katılıyorum)</span>
+          <span class="pill-count" id="statusCountAttending">0</span>
+        </button>
+        <button
+          type="button"
+          class="status-tab"
+          id="tabDeclined"
+          role="tab"
+          aria-selected="false"
+          data-status-tab="declined"
+        >
+          <span>Katılmayanlar (Katılmıyorum)</span>
+          <span class="pill-count" id="statusCountDeclined">0</span>
+        </button>
+      </div>
+
+      <ul class="status-member-list" id="statusMemberList" aria-live="polite"></ul>
+
+      <div class="member-empty status-empty" id="statusEmpty" hidden>
+        <p id="statusEmptyText">Bu etkinlik için henüz yanıt verilmedi.</p>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog class="admin-dialog budget-dialog" id="budgetIncomeDialog" aria-labelledby="incomeDialogTitle">
+    <form id="budgetIncomeForm" class="budget-dialog-body" novalidate>
+      <header class="status-dialog-head">
+        <div>
+          <p class="topbar-eyebrow">Gelir Kaydı</p>
+          <h2 class="dialog-title" id="incomeDialogTitle">Bakiye Girişi Yap</h2>
+          <p class="status-dialog-sub">Tek seferde 1 ile 5 arasında farklı gelir kaynağı ekleyebilirsiniz.</p>
+        </div>
+        <button type="button" class="admin-btn admin-btn--ghost admin-btn--icon" id="incomeCloseBtn" aria-label="Pencereyi kapat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </header>
+
+      <div class="budget-count-bar">
+        <span class="budget-count-label">Gelir Kaynağı Sayısı</span>
+        <div class="budget-count-pills" id="incomeCountSelector" role="group" aria-label="Gelir kaynağı sayısı seçin">
+          <button type="button" class="count-pill is-active" data-count-val="1" aria-pressed="true">1</button>
+          <button type="button" class="count-pill" data-count-val="2" aria-pressed="false">2</button>
+          <button type="button" class="count-pill" data-count-val="3" aria-pressed="false">3</button>
+          <button type="button" class="count-pill" data-count-val="4" aria-pressed="false">4</button>
+          <button type="button" class="count-pill" data-count-val="5" aria-pressed="false">5</button>
+        </div>
+      </div>
+
+      <div id="incomeModalAlert" class="budget-modal-alert" role="alert" aria-live="polite" hidden></div>
+
+      <div class="budget-entry-rows" id="incomeRowsContainer"></div>
+
+      <div class="dialog-actions">
+        <button type="button" id="incomeCancelBtn" class="admin-btn admin-btn--ghost">Vazgeç</button>
+        <button type="submit" id="incomeSubmitBtn" class="admin-btn admin-btn--approve">
+          <svg class="btn-spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true" hidden>
+            <path d="M12 2a10 10 0 0 1 10 10" />
+          </svg>
+          <span class="btn-label">Onayla</span>
+        </button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="admin-dialog budget-dialog" id="budgetExpenseDialog" aria-labelledby="expenseDialogTitle">
+    <form id="budgetExpenseForm" class="budget-dialog-body" novalidate>
+      <header class="status-dialog-head">
+        <div>
+          <p class="topbar-eyebrow">Gider Kaydı</p>
+          <h2 class="dialog-title" id="expenseDialogTitle">Bakiye Çıkışı</h2>
+          <p class="status-dialog-sub">Tek seferde 1 ile 5 arasında gider kalemi girebilirsiniz. Mevcut bakiyeyi aşan çıkışlara izin verilmez.</p>
+        </div>
+        <button type="button" class="admin-btn admin-btn--ghost admin-btn--icon" id="expenseCloseBtn" aria-label="Pencereyi kapat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </header>
+
+      <div class="budget-count-bar">
+        <span class="budget-count-label">Gider Kalemi Sayısı</span>
+        <div class="budget-count-pills" id="expenseCountSelector" role="group" aria-label="Gider kalemi sayısı seçin">
+          <button type="button" class="count-pill is-active" data-count-val="1" aria-pressed="true">1</button>
+          <button type="button" class="count-pill" data-count-val="2" aria-pressed="false">2</button>
+          <button type="button" class="count-pill" data-count-val="3" aria-pressed="false">3</button>
+          <button type="button" class="count-pill" data-count-val="4" aria-pressed="false">4</button>
+          <button type="button" class="count-pill" data-count-val="5" aria-pressed="false">5</button>
+        </div>
+      </div>
+
+      <div id="expenseModalAlert" class="budget-modal-alert" role="alert" aria-live="polite" hidden></div>
+
+      <div class="budget-entry-rows" id="expenseRowsContainer"></div>
+
+      <div class="dialog-actions">
+        <button type="button" id="expenseCancelBtn" class="admin-btn admin-btn--ghost">Vazgeç</button>
+        <button type="submit" id="expenseSubmitBtn" class="admin-btn admin-btn--danger">
+          <svg class="btn-spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true" hidden>
+            <path d="M12 2a10 10 0 0 1 10 10" />
+          </svg>
+          <span class="btn-label">Onayla</span>
+        </button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="admin-dialog budget-history-dialog" id="budgetHistoryDialog" aria-labelledby="historyDialogTitle">
+    <div class="budget-dialog-body">
+      <header class="status-dialog-head">
+        <div>
+          <p class="topbar-eyebrow">Mali Kayıtlar</p>
+          <h2 class="dialog-title" id="historyDialogTitle">Bütçe Hareketleri</h2>
+          <p class="status-dialog-sub" id="historyDialogSub">Tüm gelir ve gider hareketleri en yeniden eskiye listelenir.</p>
+        </div>
+        <button type="button" class="admin-btn admin-btn--ghost admin-btn--icon" id="historyCloseBtn" aria-label="Pencereyi kapat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </header>
+
+      <div class="filter-pills" id="historyFilterBar" role="group" aria-label="Hareket yönüne göre filtrele">
+        <button type="button" class="filter-pill is-active" data-tx-filter="all" aria-pressed="true">
+          Tümü <span class="pill-count" id="historyCountAll">0</span>
+        </button>
+        <button type="button" class="filter-pill" data-tx-filter="income" aria-pressed="false">
+          Girişler <span class="pill-count" id="historyCountIncome">0</span>
+        </button>
+        <button type="button" class="filter-pill" data-tx-filter="expense" aria-pressed="false">
+          Çıkışlar <span class="pill-count" id="historyCountExpense">0</span>
+        </button>
+      </div>
+
+      <ul class="budget-tx-list budget-tx-list--modal" id="budgetHistoryList" aria-live="polite"></ul>
+
+      <div class="member-empty status-empty" id="budgetHistoryEmpty" hidden>
+        <p id="budgetHistoryEmptyText">Gösterilecek bütçe hareketi bulunmuyor.</p>
+      </div>
+    </div>
+  </dialog>
+
+  <div class="toast-region" id="toastRegion" role="status" aria-live="polite"></div>
+
+  <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script defer src="./js/firebase-config.js"></script>
+  <script defer src="./js/theme.js"></script>
+  <script defer src="./js/ui.js"></script>
+  <script defer src="./js/auth.js"></script>
+  <script defer src="./js/admin.js"></script>
+  <script defer src="./js/admin-events.js"></script>
+  <script defer src="./js/admin-overview.js"></script>
+  <script defer src="./js/admin-budget.js"></script>
+</body>
+</html>

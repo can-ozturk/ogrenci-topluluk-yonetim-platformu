@@ -1,12 +1,6 @@
-/* ==========================================================================
-   Atatürk Topluluğu — Arayüz Yardımcıları ve SVG İkon Kontrolleri (js/ui.js)
-   Güvenlik: Tüm mesajlar yalnızca textContent ile DOM'a yazılır (XSS koruması).
-   ========================================================================== */
-
 (function (window, document) {
   "use strict";
 
-  /* Şifre Göster / Gizle Butonlarını Başlat */
   function initPasswordToggles() {
     var toggleButtons = document.querySelectorAll("[data-toggle-password]");
     for (var i = 0; i < toggleButtons.length; i++) {
@@ -15,7 +9,6 @@
         var input = document.getElementById(targetId);
         if (!input) return;
 
-        /* Başlangıçta her zaman gizli (type="password") */
         input.setAttribute("type", "password");
         btn.setAttribute("data-visible", "false");
         btn.setAttribute("aria-pressed", "false");
@@ -38,20 +31,18 @@
             nextVisible ? "Şifreyi gizle" : "Şifreyi göster"
           );
 
-          /* İmleç konumunu koruyarak input odağını sürdür */
           try {
             input.focus({ preventScroll: true });
             var len = input.value ? input.value.length : 0;
             input.setSelectionRange(len, len);
           } catch (e) {
-            /* Bazı mobil tarayıcılarda setSelectionRange kısıtlaması */
+
           }
         });
       })(toggleButtons[i]);
     }
   }
 
-  /* Genel Form Bildirim / Hata Kutusu Gösterimi */
   var ALERT_ICONS = {
     success:
       '<circle cx="12" cy="12" r="10" /><path d="m8.5 12.5 2.3 2.3 4.7-4.8" />',
@@ -110,7 +101,6 @@
     }
   }
 
-  /* Alan Bazlı Hata Gösterimi / Temizleme */
   function setFieldError(inputEl, errorEl, message) {
     if (inputEl) {
       inputEl.setAttribute("aria-invalid", "true");
@@ -137,7 +127,6 @@
     }
   }
 
-  /* Gönderim Butonu Yükleniyor Durumu */
   function setButtonLoading(btnEl, isLoading, loadingText, defaultText) {
     if (!btnEl) return;
     var spinner = btnEl.querySelector(".btn-spinner");

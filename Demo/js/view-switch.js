@@ -1,12 +1,3 @@
-/* ==========================================================================
-   Atatürk Topluluğu — Giriş <-> Kayıt Görünüm Geçişi (js/view-switch.js)
-   Sayfa yenilenmeden geçiş yapar; sol sütun (daktilo dahil) hiç yeniden
-   çizilmez. Mevcut içerik ~16px sola kayıp bulanıklaşarak solar, yeni içerik
-   sağdan gelip netleşir; kart yüksekliği yumuşakça yeni içeriğe uyar.
-   Bağlantılar (href="./register.html" / "./index.html") JS çalışmasa da
-   normal sayfa gezintisi olarak çalışmaya devam eder.
-   ========================================================================== */
-
 (function (window, document) {
   "use strict";
 
@@ -38,7 +29,6 @@
     var busy = false;
     var queued = null;
 
-    /* ------------------------------------------------------------------ */
     function viewFromLocation() {
       return /register\.html$/i.test(window.location.pathname) ? "register" : "login";
     }
@@ -47,7 +37,7 @@
       try {
         window.history[push ? "pushState" : "replaceState"]({ view: view }, "", URLS[view]);
       } catch (e) {
-        /* file:// gibi ortamlarda URL güncellenemez; görünüm yine de değişir */
+
       }
     }
 
@@ -55,7 +45,6 @@
       if (window.AtaturkUI) window.AtaturkUI.hideFormAlert();
     }
 
-    /* Tek ortak bildirim kutusunu aktif görünümün başlığının altına taşır */
     function moveAlert(view) {
       var head = view.querySelector(".view-head");
       if (alertBox && head && head.parentNode) {
@@ -63,15 +52,11 @@
       }
     }
 
-    /* Sağ sütunda sabit min-height tutmak yerine aktif görünüm kendi doğal
-       yüksekliğini alır; böylece giriş ekranı sol sütunla dikeyde tam hizalanır
-       ve ekran yüksekliğini aşmaz. */
     function reserveHeight() {
       if (!column) return;
       column.style.minHeight = "";
     }
 
-    /* ------------------------------------------------------------------ */
     function switchTo(next, push) {
       if (next === current) return;
       if (busy) {
@@ -98,7 +83,7 @@
         to.hidden = false;
         to.classList.add("is-active", "is-entering");
 
-        var endHeight = to.offsetHeight + vPad; /* yeniden akış tetikler */
+        var endHeight = to.offsetHeight + vPad;
         viewport.style.height = endHeight + "px";
 
         window.requestAnimationFrame(function () {
@@ -128,7 +113,6 @@
       }, LEAVE_MS);
     }
 
-    /* ------------------------------------------------------------------ */
     document.addEventListener("click", function (e) {
       var link = e.target.closest ? e.target.closest("[data-switch-view]") : null;
       if (!link) return;
@@ -144,8 +128,6 @@
       switchTo(view, null);
     });
 
-    /* ------------------------------------------------------------------ */
-    /* Başlangıç durumu */
     views.login.hidden = current !== "login";
     views.register.hidden = current !== "register";
     views[current].classList.add("is-active");
