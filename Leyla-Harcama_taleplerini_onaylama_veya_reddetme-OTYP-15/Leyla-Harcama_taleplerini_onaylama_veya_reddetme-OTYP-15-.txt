@@ -1,0 +1,29 @@
+### 1. Tanım
+Bir Muhasebe Sorumlusu olarak,  
+İstiyorum ki departman yöneticileri tarafından oluşturulan harcama taleplerini (kasa bakiyesi kontrolü ve ret gerekçesi ile) onaylayabileyim veya reddedebileyim,  
+Böylece onaylanan harcamaların doğrudan kasadan düşmesini sağlayıp bütçe dışına çıkılmasını önleyebileyim.
+
+### 2. Kabul Kriterleri 
+* **AC-01 (Harcama Onayı ve Kasa Düşümü):** Onaylanan harcama talebi doğrudan topluluk kasasından düşmeli ve sisteme "Gider" olarak kaydedilmelidir.
+* **AC-02 (Ret ve Gerekçe Zorunluluğu):** Harcama talebi reddedildiğinde kullanıcının ret gerekçesi girmesi zorunlu olmalıdır; gerekçe girilmeden ret işlemi tamamlanamamalıdır.
+* **AC-03 (Bütçe Aşımı Uyarısı):** Talep edilen harcama tutarı mevcut kasa bakiyesini aşıyorsa sistem kullanıcıya uyarı vermelidir.
+* **AC-04 (Yetkilendirme):** Harcama taleplerini onaylama ve reddetme işlemlerini yalnızca "Muhasebe Sorumlusu" rolündeki kullanıcı yapabilmelidir.
+
+### 3. Test Senaryosu 
+* **Given (Önkoşul):** Kullanıcı Muhasebe Sorumlusu rolüyle "Harcama Talepleri" sayfasındadır ve mevcut kasa bakiyesi 1.000 TL'dir.
+* **When (Eylem):** Departman yöneticisi tarafından gönderilen 400 TL tutarındaki harcama talebini inceler ve "Onayla" butonuna basar.
+* **Then (Sonuç):** Sistem talebin durumunu "Onaylandı" olarak günceller, 400 TL'yi gider olarak kaydeder ve güncel kasa bakiyesini 600 TL'ye düşürür.
+
+### 4. Veri Alanları
+
+| Alan Adı | Veri Tipi | Zorunlu mu? | Açıklama |
+| :--- | :--- | :---: | :--- |
+| `request_id` | String | Evet | Benzersiz harcama talebi numarası |
+| `department_id` | String | Evet | Talebin ait olduğu departman numarası |
+| `amount` | Decimal | Evet | Talep edilen harcama tutarı (TL) |
+| `status` | Enum | Evet | Talep durumu (Beklemede / Onaylandı / Reddedildi) |
+| `rejection_reason` | String | Koşullu | Durum "Reddedildi" ise girilmesi zorunlu ret gerekçesi |
+| `approved_by` | String | Evet | İşlemi onaylayan veya reddeden muhasebe sorumlusu ID'si |
+| `processed_at` | DateTime | Evet | Onay veya ret işleminin yapıldığı tarih ve saat |
+
+
