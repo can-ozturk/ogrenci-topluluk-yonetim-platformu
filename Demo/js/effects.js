@@ -1,11 +1,3 @@
-/* ==========================================================================
-   Atatürk Topluluğu — Arka Plan Paralaksı ve Platform Kenarlık Işığı
-   (js/effects.js)
-   - Fare hareketine karşılık arka plan görseli TERS yönde, maks. ±12px kayar.
-   - Fare cam platform üzerindeyken kenarlıkta imleci takip eden ışık görünür
-     (CSS: .glass-platform::before, --mx / --my).
-   ========================================================================== */
-
 (function (window, document) {
   "use strict";
 
@@ -63,7 +55,7 @@
         if (e.pointerType === "touch") return;
         var nx = e.clientX / window.innerWidth - 0.5;
         var ny = e.clientY / window.innerHeight - 0.5;
-        /* Ters yön */
+
         target.x = -nx * 2 * MAX_OFFSET;
         target.y = -ny * 2 * MAX_OFFSET;
         if (!rafId) rafId = window.requestAnimationFrame(tick);

@@ -1,7 +1,3 @@
-/* ==========================================================================
-   Atatürk Topluluğu — Koyu / Açık Tema Yönetimi (js/theme.js)
-   ========================================================================== */
-
 (function (window, document) {
   "use strict";
 
@@ -14,7 +10,7 @@
         return val;
       }
     } catch (e) {
-      /* file:// veya gizli sekme kısıtlamalarında sessizce devam et */
+
     }
     return null;
   }
@@ -23,7 +19,7 @@
     try {
       window.localStorage.setItem(STORAGE_KEY, theme);
     } catch (e) {
-      /* localStorage erişimi kapalıysa sessizce devam et */
+
     }
   }
 
@@ -36,7 +32,7 @@
         return "light";
       }
     } catch (e) {
-      /* Varsayılan olarak koyu tema */
+
     }
     return "dark";
   }
@@ -124,7 +120,7 @@
       anim.oncancel = remove;
       window.setTimeout(remove, WAVE_DURATION + 120);
     } catch (e) {
-      /* Eski tarayıcılarda sessizce geç */
+
     }
   }
 
@@ -225,11 +221,10 @@
         }
       }
     } catch (e) {
-      /* Eski tarayıcı uyumu */
+
     }
   }
 
-  /* Sayfa boyanmadan önce varsa mevcut temayı hemen uygula */
   var initialTheme = getSavedTheme() || getSystemPreferredTheme();
   document.documentElement.setAttribute("data-theme", initialTheme);
 

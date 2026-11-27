@@ -1,14 +1,3 @@
-/* ==========================================================================
-   Atatürk Topluluğu — Fare Takipli Partikül Ağı (js/particles.js)
-   Saf Canvas + requestAnimationFrame. Harici kütüphane yok.
-   - Sıcak taş/krem partiküller (~%13'ü bayrak kırmızısı / bordo, hafif parıltılı)
-   - Yakın partiküller arasında ince ağ çizgileri
-   - Fare (veya parmak) çevresinde gecikmeli yörünge kümesi, ışık hâlesi
-   - Tıklama / dokunma: dışa doğru dalga
-   - Sekme gizlenince durur, prefers-reduced-motion'da hareket ciddi azalır
-   Canvas pointer-events: none olduğundan form kullanımını engellemez.
-   ========================================================================== */
-
 (function (window, document) {
   "use strict";
 
@@ -30,7 +19,6 @@
     rippleBand: 70
   };
 
-  /* Tema paletleri: [r, g, b] */
   var PALETTES = {
     dark: { cream: [230, 220, 200], red: [214, 38, 82] },
     light: { cream: [244, 236, 222], red: [214, 32, 78] }
@@ -63,9 +51,6 @@
     return "rgba(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + "," + alpha + ")";
   }
 
-  /* ------------------------------------------------------------------------
-     Parıltı sprite'ları (shadowBlur yerine ön-çizimli, performanslı)
-     ------------------------------------------------------------------------ */
   function createSprite(rgb) {
     var size = 64;
     var c = document.createElement("canvas");
@@ -95,9 +80,6 @@
     };
   }
 
-  /* ------------------------------------------------------------------------
-     Partikül
-     ------------------------------------------------------------------------ */
   function createParticle(w, h) {
     var isRed = Math.random() < CONFIG.redShare;
     return {
@@ -135,9 +117,6 @@
     }
   }
 
-  /* ------------------------------------------------------------------------
-     Boyutlandırma
-     ------------------------------------------------------------------------ */
   function resize() {
     var oldW = state.width;
     var oldH = state.height;
@@ -161,9 +140,6 @@
     syncParticleCount();
   }
 
-  /* ------------------------------------------------------------------------
-     Güncelleme
-     ------------------------------------------------------------------------ */
   function update(dt, now) {
     var w = state.width;
     var h = state.height;
@@ -175,7 +151,6 @@
 
     p.strength += ((p.active ? 1 : 0) - p.strength) * Math.min(1, 0.08 * dt);
 
-    /* Dalgaları ilerlet */
     for (i = state.ripples.length - 1; i >= 0; i--) {
       state.ripples[i].t += (dt * 16.667) / 1000;
       if (state.ripples[i].t >= CONFIG.rippleLife) {
@@ -186,12 +161,10 @@
     for (i = 0; i < state.particles.length; i++) {
       part = state.particles[i];
 
-      /* Yavaş, organik süzülme */
       part.angle += (Math.random() - 0.5) * 0.03 * dt;
       var driftX = Math.cos(part.angle) * part.speed * motion;
       var driftY = Math.sin(part.angle) * part.speed * motion;
 
-      /* Fare etkileşimi: gecikmeli (easing) çekim + yörünge + hafif girdap */
       var dx = part.x - p.x;
       var dy = part.y - p.y;
       var d = Math.sqrt(dx * dx + dy * dy);
@@ -208,7 +181,6 @@
         part.vy += (ny * radial + nx * swirl) * dt;
       }
 
-      /* Tıklama dalgaları */
       for (j = 0; j < state.ripples.length; j++) {
         var rp = state.ripples[j];
         var rx = part.x - rp.x;
@@ -228,7 +200,6 @@
       part.x += (driftX + part.vx) * dt;
       part.y += (driftY + part.vy) * dt;
 
-      /* Kenarlardan taşınca karşı taraftan devam et */
       if (part.x < -20) part.x = w + 20;
       else if (part.x > w + 20) part.x = -20;
       if (part.y < -20) part.y = h + 20;
@@ -236,9 +207,6 @@
     }
   }
 
-  /* ------------------------------------------------------------------------
-     Çizim
-     ------------------------------------------------------------------------ */
   function draw(now) {
     var w = state.width;
     var h = state.height;
@@ -251,7 +219,6 @@
 
     ctx.clearRect(0, 0, w, h);
 
-    /* İmleç çevresinde yumuşak ışık hâlesi */
     if (p.strength > 0.01) {
       var halo = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 150);
       halo.addColorStop(0, rgba(pal.cream, 0.11 * p.strength));
@@ -260,7 +227,6 @@
       ctx.fillRect(p.x - 150, p.y - 150, 300, 300);
     }
 
-    /* Tıklama dalgası halkaları (çok silik) */
     ctx.lineWidth = 1;
     ctx.strokeStyle = rgba(pal.cream, 1);
     for (i = 0; i < state.ripples.length; i++) {
@@ -271,7 +237,6 @@
       ctx.stroke();
     }
 
-    /* Partiküller arası ağ çizgileri */
     ctx.lineWidth = 0.8;
     ctx.strokeStyle = rgba(pal.cream, 1);
     for (i = 0; i < parts.length; i++) {
@@ -293,7 +258,6 @@
       }
     }
 
-    /* İmleç ile yakın partiküller arası çizgiler: yaklaştıkça parlar */
     if (p.strength > 0.01) {
       for (i = 0; i < parts.length; i++) {
         a = parts[i];
@@ -312,7 +276,6 @@
       }
     }
 
-    /* Partiküller */
     for (i = 0; i < parts.length; i++) {
       a = parts[i];
       var tw = a.red ? 0.78 + 0.22 * Math.sin(now * 0.0019 + a.phase) : 1;
@@ -335,9 +298,6 @@
     ctx.globalAlpha = 1;
   }
 
-  /* ------------------------------------------------------------------------
-     Döngü
-     ------------------------------------------------------------------------ */
   function frame(now) {
     state.rafId = window.requestAnimationFrame(frame);
 
@@ -362,9 +322,6 @@
     state.rafId = 0;
   }
 
-  /* ------------------------------------------------------------------------
-     Girdi olayları (fare + dokunma, pasif; sayfa kaydırmayı/etkileşimi engellemez)
-     ------------------------------------------------------------------------ */
   function setPointer(e) {
     state.pointer.x = e.clientX;
     state.pointer.y = e.clientY;
@@ -434,9 +391,6 @@
     }
   }
 
-  /* ------------------------------------------------------------------------
-     Başlat
-     ------------------------------------------------------------------------ */
   state.motion = reducedMotionQuery && reducedMotionQuery.matches ? 0.2 : 1;
   applyTheme();
   resize();

@@ -1,16 +1,8 @@
-/* ==========================================================================
-   Atatürk Topluluğu — Kimlik Doğrulama ve Panel Stilleri
-   Figma Referansı: Glass Effect Login Page (Node 2:172)
-   Koyu / Açık Tema, Tam Ekran Atatürk Görseli, Glassmorphism ve Erişilebilirlik
-   ========================================================================== */
-
 :root {
-  /* Arka plan görsel hizalaması: Atatürk portresinin yüz kısmı kesilmesin diye
-     dikeyde %22'ye sabitlenmiştir. İhtiyaca göre kolayca değiştirilebilir. */
+
   --bg-image-url: url("../assets/ataturk-bg.jpg");
   --bg-position: center 22%;
 
-  /* Tipografi ve Ölçüler (Figma 2:172 ölçülerine sadık) */
   --font-sans: "Inter", "Geist", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Arial, sans-serif;
   --card-max-width: 540px;
   --card-radius: 40px;
@@ -22,18 +14,15 @@
   --btn-radius: 10px;
   --glass-blur: 25px;
 
-  /* Geçiş Süreleri */
   --theme-transition: 400ms cubic-bezier(0.22, 1, 0.36, 1);
   --fast-transition: 200ms cubic-bezier(0.22, 1, 0.36, 1);
 
-  /* Birincil Vurgu Rengi (Figma #BD0C47 - Asil Kızıl/Bordo) */
   --primary: #BD0C47;
   --primary-hover: #D41153;
   --primary-active: #9E083A;
   --primary-glow: rgba(189, 12, 71, 0.42);
   --primary-text: #FFFFFF;
 
-  /* Durum Renkleri */
   --danger: #FF5A6E;
   --danger-bg: rgba(255, 90, 110, 0.14);
   --danger-border: rgba(255, 90, 110, 0.45);
@@ -48,10 +37,6 @@
   --info-border: rgba(93, 173, 226, 0.48);
 }
 
-/* ==========================================================================
-   KOYU TEMA (Varsayılan / [data-theme="dark"])
-   Figma #0F0C29 -> #302B63 -> #24243E + Koyu Lacivert-Gri Karartma Katmanı
-   ========================================================================== */
 :root,
 :root[data-theme="dark"] {
   --bg-fallback-gradient: linear-gradient(135deg, #0F0C29 0%, #302B63 52%, #24243E 100%);
@@ -60,7 +45,6 @@
     linear-gradient(135deg, rgba(11, 14, 29, 0.52) 0%, rgba(42, 16, 38, 0.44) 50%, rgba(15, 18, 34, 0.58) 100%);
   --bg-photo-filter: blur(2.2px) saturate(0.86) brightness(0.86);
 
-  /* Cam Kart (Figma: fill white 0.10, blur 25px, stroke white 0.79 -> 0.24) */
   --card-bg: linear-gradient(
     145deg,
     rgba(255, 255, 255, 0.13) 0%,
@@ -70,14 +54,12 @@
   --card-border-bottom: rgba(255, 255, 255, 0.20);
   --card-shadow: 0 24px 60px rgba(0, 0, 0, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.35);
 
-  /* Metin Renkleri (WCAG AA yüksek kontrast) */
   --text-primary: #FFFFFF;
   --text-secondary: #E2E6F0;
   --text-muted: #B4BCD0;
   --link-color: #FF759F;
   --link-hover: #FFA3BE;
 
-  /* Input Stilleri (Figma beyaz kutu tasarımına ve koyu tema uyumuna sadık) */
   --input-bg: rgba(255, 255, 255, 0.95);
   --input-text: #1A1D29;
   --input-placeholder: #6E7485;
@@ -88,7 +70,6 @@
   --input-icon: #495061;
   --input-icon-hover: #BD0C47;
 
-  /* Tema Butonu ve Rozet */
   --toggle-bg: rgba(255, 255, 255, 0.12);
   --toggle-border: rgba(255, 255, 255, 0.32);
   --toggle-text: #FFFFFF;
@@ -98,19 +79,14 @@
   --badge-text: #FFD6E2;
 }
 
-/* ==========================================================================
-   AÇIK TEMA ([data-theme="light"])
-   Yumuşak Aydınlık Katman + Buzlu Beyaz Cam Kart + Yüksek Kontrast Koyu Metin
-   ========================================================================== */
 :root[data-theme="light"] {
-  /* Arka plan fotoğrafını beyaz sisle boğmak yerine doğal gün ışığı + sıcak taş/bordo vinyet */
+
   --bg-fallback-gradient: linear-gradient(135deg, #2B2629 0%, #3D2E35 50%, #242734 100%);
   --bg-overlay:
     radial-gradient(120% 90% at 50% 30%, rgba(255, 248, 242, 0.08) 0%, rgba(24, 20, 28, 0.36) 100%),
     linear-gradient(135deg, rgba(38, 28, 34, 0.24) 0%, rgba(189, 12, 71, 0.10) 50%, rgba(24, 26, 38, 0.30) 100%);
   --bg-photo-filter: blur(1.8px) saturate(0.96) brightness(0.98) contrast(1.03);
 
-  /* Cam Kart (dashboard vb.) */
   --card-bg: linear-gradient(
     145deg,
     rgba(255, 253, 251, 0.90) 0%,
@@ -120,14 +96,12 @@
   --card-border-bottom: rgba(26, 29, 41, 0.14);
   --card-shadow: 0 24px 58px rgba(18, 20, 32, 0.22), inset 0 1px 2px rgba(255, 255, 255, 0.95);
 
-  /* Metin Renkleri (WCAG AA yüksek kontrast) */
   --text-primary: #151821;
   --text-secondary: #2E3344;
   --text-muted: #555C70;
   --link-color: #A8083D;
   --link-hover: #7D052C;
 
-  /* Input Stilleri */
   --input-bg: #FFFFFF;
   --input-text: #151821;
   --input-placeholder: #687086;
@@ -138,7 +112,6 @@
   --input-icon: #525B70;
   --input-icon-hover: #BD0C47;
 
-  /* Tema Butonu ve Rozet */
   --toggle-bg: rgba(255, 253, 251, 0.88);
   --toggle-border: rgba(255, 255, 255, 0.92);
   --toggle-text: #151821;
@@ -147,7 +120,6 @@
   --badge-border: rgba(189, 12, 71, 0.32);
   --badge-text: #960736;
 
-  /* Durum Renkleri (Açık temada daha koyu metin kontrastı) */
   --danger: #B81428;
   --danger-bg: rgba(217, 30, 54, 0.10);
   --danger-border: rgba(217, 30, 54, 0.38);
@@ -162,9 +134,6 @@
   --info-border: rgba(21, 112, 171, 0.36);
 }
 
-/* ==========================================================================
-   TEMEL SIFIRLAMA VE SAYFA YAPISI
-   ========================================================================== */
 *,
 *::before,
 *::after {
@@ -196,10 +165,6 @@ body {
     background var(--theme-transition);
 }
 
-/* Tam Ekran Atatürk Arka Plan Görseli Katmanı.
-   .bg-stage: fare paralaksı (js/effects.js --parallax-x / --parallax-y, maks. ±12px);
-   kenarlar görünmesin diye 30px taşırılmıştır.
-   ::before: görselin kendisi, mat + hafif bulanık + çok yavaş ken-burns. */
 .bg-stage {
   position: fixed;
   inset: -30px;
@@ -236,7 +201,6 @@ body {
   }
 }
 
-/* Tema Duyarlı Karartma / Vinyet Katmanı (Overlay) */
 .bg-overlay {
   position: fixed;
   inset: 0;
@@ -245,9 +209,6 @@ body {
   transition: opacity var(--theme-transition);
 }
 
-/* ==========================================================================
-   DAİRESEL TEMA GEÇİŞ ANİMASYONU (Butondan Ekrana Yayılan Dalga)
-   ========================================================================== */
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;
@@ -263,8 +224,6 @@ body {
   z-index: 9999;
 }
 
-/* View Transition anında yeni temanın nihai halini anında yakalamak için
-   ara CSS renk geçişlerini bastır (Güneş/Ay ikon dönüşü hariç) */
 :root.is-theme-transitioning *,
 :root.is-theme-transitioning *::before,
 :root.is-theme-transitioning *::after {
@@ -277,7 +236,6 @@ body {
   transition-duration: 520ms !important;
 }
 
-/* Tıklanan noktadan ekranın tamamına yayılan ince ışık/bordo dalga halkası */
 .theme-wave-ring {
   position: fixed;
   left: 0;
@@ -293,9 +251,6 @@ body {
     0 0 28px 6px rgba(255, 255, 255, 0.35);
 }
 
-/* ==========================================================================
-   ÜST BAR VE ANİMASYONLU TEMA GEÇİŞ BUTONU (Güneş / Ay)
-   ========================================================================== */
 .top-Controls {
   position: fixed;
   top: 20px;
@@ -361,7 +316,6 @@ body {
   overflow: visible;
 }
 
-/* Güneş ve Ay katmanlarının yumuşak dönüş ve ölçek animasyonu */
 .theme-icon-svg .sun-group,
 .theme-icon-svg .moon-group {
   transform-origin: center center;
@@ -377,7 +331,6 @@ body {
     opacity 280ms ease;
 }
 
-/* Koyu temada: Ay aktif, Güneş gizli */
 :root[data-theme="dark"] .theme-icon-svg .sun-group {
   opacity: 0;
   transform: rotate(-90deg) scale(0.45);
@@ -393,7 +346,6 @@ body {
   transform: rotate(0deg) scale(1);
 }
 
-/* Açık temada: Güneş aktif, Ay gizli */
 :root[data-theme="light"] .theme-icon-svg .sun-group {
   opacity: 1;
   transform: rotate(0deg) scale(1);
@@ -409,9 +361,6 @@ body {
   transform: rotate(90deg) scale(0.45);
 }
 
-/* ==========================================================================
-   GLASSMORPHISM KART (Figma 2:172)
-   ========================================================================== */
 .auth-main {
   width: 100%;
   max-width: var(--card-max-width);
@@ -437,7 +386,6 @@ body {
     box-shadow var(--theme-transition);
 }
 
-/* Başlık ve Topluluk Logosu Alanı */
 .brand-header {
   margin-bottom: 26px;
 }
@@ -465,9 +413,6 @@ body {
   line-height: 1.5;
 }
 
-/* ==========================================================================
-   UYARI / BİLGİ / HATA KUTULARI (Banners)
-   ========================================================================== */
 .alert-box {
   display: flex;
   align-items: flex-start;
@@ -535,9 +480,6 @@ body {
   color: var(--info);
 }
 
-/* ==========================================================================
-   FORM ELEMANLARI VE INPUTLAR
-   ========================================================================== */
 .auth-form {
   display: flex;
   flex-direction: column;
@@ -607,7 +549,6 @@ body {
   border-color: var(--success);
 }
 
-/* Şifre Göster / Gizle Animasyonlu Göz İkonu Butonu */
 .password-toggle-btn {
   position: absolute;
   right: 8px;
@@ -658,7 +599,6 @@ body {
     opacity 220ms ease;
 }
 
-/* Şifre gizliyken (varsayılan): üstü çizili göz aktif */
 .password-toggle-btn[data-visible="false"] .eye-slash {
   opacity: 1;
   transform: scale(1);
@@ -669,7 +609,6 @@ body {
   transform: scale(0.82);
 }
 
-/* Şifre görünürken: çizgi kalkar, göz bebeği netleşir */
 .password-toggle-btn[data-visible="true"] .eye-slash {
   opacity: 0;
   transform: scale(0.2) rotate(-20deg);
@@ -680,7 +619,6 @@ body {
   transform: scale(1.08);
 }
 
-/* Alan Altı Hata ve Yardım Metinleri */
 .field-hint {
   margin-top: 5px;
   font-size: 0.78rem;
@@ -720,9 +658,6 @@ body {
   color: var(--danger);
 }
 
-/* ==========================================================================
-   BİRİNCİL AKSİYON BUTONU (Figma #BD0C47, height 50px, radius 10px)
-   ========================================================================== */
 .submit-btn {
   margin-top: 8px;
   width: 100%;
@@ -769,7 +704,6 @@ body {
   cursor: not-allowed;
 }
 
-/* Yükleniyor (Spinner) SVG Animasyonu */
 .btn-spinner {
   width: 20px;
   height: 20px;
@@ -789,9 +723,6 @@ body {
   }
 }
 
-/* ==========================================================================
-   ALT GEÇİŞ BAĞLANTISI (Giriş <-> Kayıt)
-   ========================================================================== */
 .auth-footer {
   margin-top: 26px;
   text-align: center;
@@ -818,9 +749,6 @@ body {
   border-radius: 4px;
 }
 
-/* ==========================================================================
-   PANEL (dashboard.html) ÖZEL STİLLERİ
-   ========================================================================== */
 .dashboard-card {
   max-width: 620px;
 }
@@ -898,9 +826,6 @@ body {
   transform: translateY(-1px);
 }
 
-/* ==========================================================================
-   RESPONSIVE KURALLAR (360px Mobil -> 1440px+ Masaüstü)
-   ========================================================================== */
 @media (max-width: 768px) {
   body {
     padding: 76px 16px 32px;
@@ -942,9 +867,6 @@ body {
   }
 }
 
-/* ==========================================================================
-   HAREKET AZALTMA TERCİHİ (prefers-reduced-motion: reduce)
-   ========================================================================== */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
